@@ -17,8 +17,9 @@ import orderRoutes from "./routes/order.routes.js";
 import enquiryRoutes from "./routes/enquiry.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-// server/src -> project root
-const distDir = path.join(__dirname, "../../dist");
+// server/src -> server/public (built frontend lives inside server/ so it
+// deploys together with the backend on hosts that isolate the app root)
+const distDir = path.join(__dirname, "../public");
 const hasFrontendBuild = fs.existsSync(path.join(distDir, "index.html"));
 
 const app = express();

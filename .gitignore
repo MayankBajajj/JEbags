@@ -8,6 +8,7 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+dist
 dist-ssr
 *.local
 .env
@@ -16,9 +17,9 @@ server/.env
 # working/scratch files from design exploration — not part of the deliverable
 scratch/
 
-# dist/ is intentionally committed (not ignored) — Hostinger's Node.js app
-# serves it directly with no build step on the server. Run `npm run build`
-# before each deploy push to keep it current.
+# server/public/ (the built frontend) is intentionally committed, not
+# ignored — Hostinger's Node.js app serves it with no build step on the
+# server. Run `npm run build` before each deploy push to keep it current.
 
 # Editor directories and files
 .vscode/*
