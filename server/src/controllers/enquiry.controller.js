@@ -2,6 +2,7 @@ import { z } from "zod";
 import Enquiry from "../models/Enquiry.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { phoneSchema, nameSchema } from "../utils/validators.js";
+import { sendMail } from "../utils/mailer.js";
 
 const enquirySchema = z.object({
   name: nameSchema,
@@ -16,6 +17,27 @@ const enquirySchema = z.object({
 export const createEnquiry = asyncHandler(async (req, res) => {
   const data = enquirySchema.parse(req.body);
   const enquiry = await Enquiry.create(data);
+
+  sendMail({
+    to: process.env.ADMIN_EMAIL,
+    subject: `New ${data.type} enquiry from ${data.name}`,
+    html: `
+      <div style="font-family:sans-serif;max-width:480px;margin:0 auto;padding:24px">
+        <h2 style="color:#0f1e36">New Enquiry — JE BAGS</h2>
+        <table style="width:100%;font-size:14px;color:#1a1a1a">
+          <tr><td style="padding:4px 0;color:#6b6151">Name</td><td style="padding:4px 0">${data.name}</td></tr>
+          <tr><td style="padding:4px 0;color:#6b6151">Email</td><td style="padding:4px 0">${data.email}</td></tr>
+          <tr><td style="padding:4px 0;color:#6b6151">Phone</td><td style="padding:4px 0">${data.phone}</td></tr>
+          ${data.company ? `<tr><td style="padding:4px 0;color:#6b6151">Company</td><td style="padding:4px 0">${data.company}</td></tr>` : ""}
+          <tr><td style="padding:4px 0;color:#6b6151">Type</td><td style="padding:4px 0">${data.type}</td></tr>
+          ${data.estimatedQuantity ? `<tr><td style="padding:4px 0;color:#6b6151">Est. Quantity</td><td style="padding:4px 0">${data.estimatedQuantity}</td></tr>` : ""}
+        </table>
+        <p style="margin-top:16px;color:#6b6151">Message:</p>
+        <p style="white-space:pre-wrap">${data.message}</p>
+      </div>
+    `,
+  }).catch((err) => console.error("Failed to send enquiry notification email:", err));
+
   res.status(201).json({ message: "Enquiry received, our team will reach out shortly", enquiry });
 });
 

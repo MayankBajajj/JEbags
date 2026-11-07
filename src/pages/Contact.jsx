@@ -2,21 +2,33 @@ import { useState } from "react";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
 import { company } from "../data/content";
+import { api, ApiError } from "../lib/api";
 
 const inputClasses =
   "w-full rounded-xl border border-ink-900/15 bg-white px-4 py-3 text-sm text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 transition-all";
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", company: "", message: "" });
+  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    setSubmitted(true);
+    setError("");
+    setSubmitting(true);
+    try {
+      await api.post("/enquiries", form);
+      setSubmitted(true);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -95,7 +107,7 @@ export default function Contact() {
                   <button
                     onClick={() => {
                       setSubmitted(false);
-                      setForm({ name: "", email: "", company: "", message: "" });
+                      setForm({ name: "", email: "", phone: "", company: "", message: "" });
                     }}
                     className="mt-8 text-sm font-semibold text-gold-600 border-b-2 border-gold-500 pb-1"
                   >
@@ -133,17 +145,35 @@ export default function Contact() {
                       />
                     </div>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold tracking-wide text-ink-900 mb-2">
-                      Company Name
-                    </label>
-                    <input
-                      name="company"
-                      value={form.company}
-                      onChange={handleChange}
-                      placeholder="Your organization"
-                      className={inputClasses}
-                    />
+                  <div className="grid sm:grid-cols-2 gap-5">
+                    <div>
+                      <label className="block text-xs font-semibold tracking-wide text-ink-900 mb-2">
+                        Phone Number
+                      </label>
+                      <input
+                        required
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={handleChange}
+                        placeholder="9876543210"
+                        pattern="[6-9][0-9]{9}"
+                        title="10-digit Indian mobile number"
+                        className={inputClasses}
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-semibold tracking-wide text-ink-900 mb-2">
+                        Company Name
+                      </label>
+                      <input
+                        name="company"
+                        value={form.company}
+                        onChange={handleChange}
+                        placeholder="Your organization"
+                        className={inputClasses}
+                      />
+                    </div>
                   </div>
                   <div>
                     <label className="block text-xs font-semibold tracking-wide text-ink-900 mb-2">
@@ -159,11 +189,17 @@ export default function Contact() {
                       className={`${inputClasses} resize-none`}
                     />
                   </div>
+                  {error && (
+                    <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                      {error}
+                    </p>
+                  )}
                   <button
                     type="submit"
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink-950 px-7 py-4 text-sm font-semibold text-cream-50 hover:bg-ink-800 transition-colors"
+                    disabled={submitting}
+                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink-950 px-7 py-4 text-sm font-semibold text-cream-50 hover:bg-ink-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Send Message
+                    {submitting ? "Sending..." : "Send Message"}
                     <Icon name="arrow-right" size={16} />
                   </button>
                 </form>
