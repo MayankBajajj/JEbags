@@ -5,8 +5,22 @@ import shipsy from "../assets/client-logos/shipsy.png";
 import physicswallah from "../assets/client-logos/physicswallah.webp";
 import yesmadam from "../assets/client-logos/yesmadam.png";
 import dmart from "../assets/client-logos/dmart.svg";
+import invergy from "../assets/client-logos/invergy.png";
+import deliveryplus from "../assets/client-logos/deliveryplus.png";
+import oliveware from "../assets/client-logos/oliveware.png";
 
-const logoMap = { numerouno, aakash, suzuki, shipsy, physicswallah, yesmadam, dmart };
+const logoMap = {
+  numerouno,
+  aakash,
+  suzuki,
+  shipsy,
+  physicswallah,
+  yesmadam,
+  dmart,
+  invergy,
+  deliveryplus,
+  oliveware,
+};
 
 export default function ClientStrip({ items }) {
   const loop = [...items, ...items];
