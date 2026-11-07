@@ -116,18 +116,19 @@ export const navLinks = [
   { label: "Contact", to: "/contact" },
 ];
 
+// logo: key into the import map in ClientStrip.jsx — omit for clients
+// without a verified official logo source (falls back to text).
 export const clients = [
-  "Numero Uno",
-  "Aakash",
-  "Parliament of India",
-  "Suzuki",
-  "Shipsy",
-  "Invergy",
-  "DeliveryPlus",
-  "Oliveware",
-  "Physics Wallah",
-  "Yes Madam",
-  "DMart",
+  { name: "Numero Uno", logo: "numerouno" },
+  { name: "Aakash", logo: "aakash" },
+  { name: "Suzuki", logo: "suzuki" },
+  { name: "Shipsy", logo: "shipsy" },
+  { name: "Invergy", logo: null },
+  { name: "DeliveryPlus", logo: null },
+  { name: "Oliveware", logo: null },
+  { name: "Physics Wallah", logo: "physicswallah" },
+  { name: "Yes Madam", logo: "yesmadam" },
+  { name: "DMart", logo: "dmart" },
 ];
 
 export const industries = [
