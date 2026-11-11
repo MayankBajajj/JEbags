@@ -5,6 +5,7 @@ import {
   listProducts,
   getProductBySlug,
   adminListProducts,
+  adminGetProduct,
   createProduct,
   updateProduct,
   removeProductImage,
@@ -26,6 +27,7 @@ router.get("/:slug", getProductBySlug);
 
 // Admin
 router.get("/admin/all", authenticate, requireAdmin, adminListProducts);
+router.get("/admin/:id", authenticate, requireAdmin, adminGetProduct);
 router.post("/admin", authenticate, requireAdmin, upload.array("images", 6), createProduct);
 router.patch("/admin/:id", authenticate, requireAdmin, upload.array("images", 6), updateProduct);
 router.delete("/admin/:id/images/:publicId", authenticate, requireAdmin, removeProductImage);

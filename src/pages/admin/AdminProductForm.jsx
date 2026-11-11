@@ -1,10 +1,12 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { api } from "../../lib/api";
 import Icon from "../../components/Icon";
 import { inputClasses } from "../../lib/formStyles";
 
 export default function AdminProductForm() {
+  const { id } = useParams();
+  const isEdit = Boolean(id);
   const navigate = useNavigate();
   const [categories, setCategories] = useState([]);
   const [form, setForm] = useState({
@@ -18,13 +20,38 @@ export default function AdminProductForm() {
     stock: "",
     isFeatured: false,
   });
+  const [existingImages, setExistingImages] = useState([]);
   const [files, setFiles] = useState([]);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
+  const [loadingProduct, setLoadingProduct] = useState(isEdit);
+  const [removingImageId, setRemovingImageId] = useState(null);
 
   useEffect(() => {
     api.get("/products/categories").then((d) => setCategories(d.categories));
   }, []);
+
+  useEffect(() => {
+    if (!isEdit) return;
+    api
+      .get(`/products/admin/${id}`)
+      .then(({ product }) => {
+        setForm({
+          name: product.name,
+          description: product.description,
+          price: product.price,
+          compareAtPrice: product.compareAtPrice ?? "",
+          category: product.category,
+          tags: (product.tags || []).join(", "),
+          moq: product.moq ?? "",
+          stock: product.stock ?? "",
+          isFeatured: product.isFeatured,
+        });
+        setExistingImages(product.images || []);
+      })
+      .catch((err) => setError(err.message))
+      .finally(() => setLoadingProduct(false));
+  }, [id, isEdit]);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -36,11 +63,27 @@ export default function AdminProductForm() {
     setFiles(selected);
   };
 
+  const handleRemoveExistingImage = async (publicId) => {
+    if (existingImages.length === 1) {
+      setError("A product needs at least one image — add a new one before removing this.");
+      return;
+    }
+    setRemovingImageId(publicId);
+    try {
+      await api.delete(`/products/admin/${id}/images/${encodeURIComponent(publicId)}`);
+      setExistingImages((prev) => prev.filter((img) => img.publicId !== publicId));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRemovingImageId(null);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
 
-    if (files.length === 0) {
+    if (!isEdit && files.length === 0) {
       setError("Add at least one product image");
       return;
     }
@@ -53,7 +96,11 @@ export default function AdminProductForm() {
       });
       files.forEach((file) => data.append("images", file));
 
-      await api.post("/products/admin", data, { isForm: true });
+      if (isEdit) {
+        await api.patch(`/products/admin/${id}`, data, { isForm: true });
+      } else {
+        await api.post("/products/admin", data, { isForm: true });
+      }
       navigate("/admin/products");
     } catch (err) {
       setError(err.message);
@@ -62,10 +109,22 @@ export default function AdminProductForm() {
     }
   };
 
+  if (loadingProduct) {
+    return (
+      <div className="p-8 sm:p-10 max-w-2xl">
+        <p className="text-sm text-ink-700/70">Loading...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="p-8 sm:p-10 max-w-2xl">
-      <h1 className="font-display font-semibold text-2xl text-ink-950 mb-1">Add Product</h1>
-      <p className="text-sm text-ink-700 mb-8">This will appear live on the storefront once saved.</p>
+      <h1 className="font-display font-semibold text-2xl text-ink-950 mb-1">
+        {isEdit ? "Edit Product" : "Add Product"}
+      </h1>
+      <p className="text-sm text-ink-700 mb-8">
+        {isEdit ? "Update pricing, stock, or details for this product." : "This will appear live on the storefront once saved."}
+      </p>
 
       <form onSubmit={handleSubmit} className="space-y-5 bg-white rounded-2xl border border-ink-900/10 p-7">
         {error && <p className="text-sm text-red-700 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>}
@@ -119,9 +178,33 @@ export default function AdminProductForm() {
           <input name="tags" value={form.tags} onChange={handleChange} className={inputClasses} placeholder="OEM Ready, Custom Branding" />
         </div>
 
+        {isEdit && existingImages.length > 0 && (
+          <div>
+            <label className="block text-xs font-semibold text-ink-900 mb-2">Current Images</label>
+            <div className="flex flex-wrap gap-2">
+              {existingImages.map((img) => (
+                <div key={img.publicId} className="relative group">
+                  <img src={img.url} alt="" className="w-16 h-16 rounded-lg object-cover border border-ink-900/10" />
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveExistingImage(img.publicId)}
+                    disabled={removingImageId === img.publicId}
+                    className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-red-600 text-white text-xs flex items-center justify-center hover:bg-red-700 disabled:opacity-50"
+                    title="Remove image"
+                  >
+                    ×
+                  </button>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div>
-          <label className="block text-xs font-semibold text-ink-900 mb-2">Product Images (up to 6)</label>
-          <input required type="file" accept="image/*" multiple onChange={handleFiles} className={`${inputClasses} py-2.5`} />
+          <label className="block text-xs font-semibold text-ink-900 mb-2">
+            {isEdit ? "Add More Images (optional)" : "Product Images (up to 6)"}
+          </label>
+          <input required={!isEdit} type="file" accept="image/*" multiple onChange={handleFiles} className={`${inputClasses} py-2.5`} />
           {files.length > 0 && (
             <div className="mt-3 flex flex-wrap gap-2">
               {files.map((f, i) => (
@@ -143,7 +226,7 @@ export default function AdminProductForm() {
           disabled={loading}
           className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink-950 px-7 py-3.5 text-sm font-semibold text-cream-50 hover:bg-ink-800 transition-colors disabled:opacity-60"
         >
-          {loading ? "Saving..." : "Save Product"}
+          {loading ? "Saving..." : isEdit ? "Save Changes" : "Save Product"}
           {!loading && <Icon name="arrow-right" size={16} />}
         </button>
       </form>

@@ -46,6 +46,16 @@ export const adminListProducts = asyncHandler(async (req, res) => {
   res.json({ items });
 });
 
+export const adminGetProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+  if (!product) return res.status(404).json({ message: "Product not found" });
+  res.json({ product });
+});
+
+// z.coerce.boolean() treats any non-empty string (including "false") as true,
+// since form-data sends booleans as strings — preprocess to the real value first.
+const formBoolean = () => z.preprocess((v) => v === "true" || v === true, z.boolean());
+
 const productSchema = z.object({
   name: z.string().min(2),
   description: z.string().min(10),
@@ -55,7 +65,7 @@ const productSchema = z.object({
   tags: z.string().optional(), // comma-separated in form-data
   moq: z.coerce.number().positive().optional(),
   stock: z.coerce.number().min(0).optional(),
-  isFeatured: z.coerce.boolean().optional(),
+  isFeatured: formBoolean().optional(),
 });
 
 export const createProduct = asyncHandler(async (req, res) => {

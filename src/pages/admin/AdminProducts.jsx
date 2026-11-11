@@ -93,13 +93,21 @@ export default function AdminProducts() {
                     </span>
                   </td>
                   <td className="py-3 px-5 text-right">
-                    <button
-                      onClick={() => handleDelete(p._id, p.name)}
-                      disabled={deletingId === p._id}
-                      className="text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50"
-                    >
-                      {deletingId === p._id ? "Deleting..." : "Delete"}
-                    </button>
+                    <div className="flex items-center justify-end gap-4">
+                      <Link
+                        to={`/admin/products/${p._id}/edit`}
+                        className="text-xs font-semibold text-ink-900 hover:text-gold-600"
+                      >
+                        Edit
+                      </Link>
+                      <button
+                        onClick={() => handleDelete(p._id, p.name)}
+                        disabled={deletingId === p._id}
+                        className="text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50"
+                      >
+                        {deletingId === p._id ? "Deleting..." : "Delete"}
+                      </button>
+                    </div>
                   </td>
                 </tr>
               ))}
