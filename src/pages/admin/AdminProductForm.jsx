@@ -63,6 +63,8 @@ export default function AdminProductForm() {
     setFiles(selected);
   };
 
+  const selectOnFocus = (e) => e.target.select();
+
   const handleRemoveExistingImage = async (publicId) => {
     if (existingImages.length === 1) {
       setError("A product needs at least one image — add a new one before removing this.");
@@ -154,22 +156,22 @@ export default function AdminProductForm() {
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-ink-900 mb-2">Price (₹)</label>
-            <input required type="number" min="0" name="price" value={form.price} onChange={handleChange} className={inputClasses} placeholder="1999" />
+            <input required type="number" min="0" name="price" value={form.price} onChange={handleChange} onFocus={selectOnFocus} className={inputClasses} placeholder="1999" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-ink-900 mb-2">Compare-at Price (₹)</label>
-            <input type="number" min="0" name="compareAtPrice" value={form.compareAtPrice} onChange={handleChange} className={inputClasses} placeholder="Optional" />
+            <input type="number" min="0" name="compareAtPrice" value={form.compareAtPrice} onChange={handleChange} onFocus={selectOnFocus} className={inputClasses} placeholder="Optional" />
           </div>
         </div>
 
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-xs font-semibold text-ink-900 mb-2">MOQ (Minimum Order Qty)</label>
-            <input type="number" min="1" name="moq" value={form.moq} onChange={handleChange} className={inputClasses} placeholder="1" />
+            <input type="number" min="1" name="moq" value={form.moq} onChange={handleChange} onFocus={selectOnFocus} className={inputClasses} placeholder="1" />
           </div>
           <div>
             <label className="block text-xs font-semibold text-ink-900 mb-2">Stock</label>
-            <input type="number" min="0" name="stock" value={form.stock} onChange={handleChange} className={inputClasses} placeholder="0" />
+            <input type="number" min="0" name="stock" value={form.stock} onChange={handleChange} onFocus={selectOnFocus} className={inputClasses} placeholder="0" />
           </div>
         </div>
 

@@ -60,7 +60,7 @@ export default function Checkout() {
 
   if (order) {
     return (
-      <section className="min-h-screen bg-cream-50 pt-32 pb-20 px-5">
+      <section className="bg-cream-50 pt-32 pb-24 px-5">
         <div className="max-w-lg mx-auto text-center">
           <div className="w-16 h-16 rounded-full bg-beige-200/70 flex items-center justify-center mx-auto mb-6">
             <Icon name="check" size={28} className="text-gold-600" />
@@ -86,7 +86,7 @@ export default function Checkout() {
   }
 
   return (
-    <section className="min-h-screen bg-cream-50 pt-32 pb-20 px-5">
+    <section className="bg-cream-50 pt-32 pb-24 px-5">
       <div className="max-w-3xl mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-8">
         <div>
           <h1 className="font-display font-semibold text-3xl text-ink-950 mb-6">Checkout</h1>

@@ -7,7 +7,7 @@ export default function Cart() {
 
   if (items.length === 0) {
     return (
-      <section className="min-h-screen bg-cream-50 pt-32 pb-20 px-5">
+      <section className="bg-cream-50 pt-32 pb-24 px-5">
         <div className="max-w-lg mx-auto text-center">
           <h1 className="font-display font-semibold text-3xl text-ink-950 mb-3">Your Cart is Empty</h1>
           <p className="text-ink-700 mb-8">Browse our range and add a few products to get started.</p>
@@ -24,7 +24,7 @@ export default function Cart() {
   }
 
   return (
-    <section className="min-h-screen bg-cream-50 pt-32 pb-20 px-5">
+    <section className="bg-cream-50 pt-32 pb-24 px-5">
       <div className="max-w-3xl mx-auto">
         <h1 className="font-display font-semibold text-3xl text-ink-950 mb-8">Your Cart</h1>
 
