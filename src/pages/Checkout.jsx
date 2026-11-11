@@ -87,7 +87,7 @@ export default function Checkout() {
 
   return (
     <section className="bg-cream-50 pt-32 pb-24 px-5">
-      <div className="max-w-3xl mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-8">
+      <div className="max-w-5xl mx-auto grid lg:grid-cols-[1.3fr_1fr] gap-8 items-start">
         <div>
           <h1 className="font-display font-semibold text-3xl text-ink-950 mb-6">Checkout</h1>
           <form onSubmit={handleSubmit} className="space-y-4 bg-white rounded-2xl border border-ink-900/10 p-7">
@@ -134,7 +134,7 @@ export default function Checkout() {
           </form>
         </div>
 
-        <div className="h-fit bg-white rounded-2xl border border-ink-900/10 p-6">
+        <div className="lg:sticky lg:top-28 bg-white rounded-2xl border border-ink-900/10 p-6">
           <h2 className="font-display font-semibold text-lg text-ink-950 mb-4">Order Summary</h2>
           <div className="space-y-3 mb-4">
             {items.map((item) => (
