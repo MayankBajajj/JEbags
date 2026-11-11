@@ -5,7 +5,6 @@ import TrustStrip from "../components/TrustStrip";
 import CategoryShowcase from "../components/CategoryShowcase";
 import SplitBanner from "../components/SplitBanner";
 import GlobeArt from "../components/GlobeArt";
-import SectionHeading from "../components/SectionHeading";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
@@ -47,15 +46,7 @@ export default function Home() {
       {/* Product categories */}
       <section className="py-20 sm:py-24 bg-cream-50">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-10">
-            <div>
-              <span className="inline-block text-xs tracking-[0.25em] font-semibold text-gold-600 uppercase mb-3">
-                Our Product Categories
-              </span>
-              <h2 className="font-display font-semibold text-3xl sm:text-4xl text-ink-950 leading-tight max-w-lg">
-                Bags for Every Purpose. Designed for Every Brand.
-              </h2>
-            </div>
+          <div className="flex items-center justify-end mb-8">
             <Link
               to="/products"
               className="inline-flex items-center gap-2 text-sm font-semibold text-gold-600 hover:text-gold-700 transition-colors whitespace-nowrap"
@@ -171,22 +162,19 @@ export default function Home() {
       {bestSellers && bestSellers.length > 0 && (
         <section className="py-20 sm:py-24 bg-cream-50">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-            <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
-              <SectionHeading eyebrow="Featured Products" title="Best Sellers from Our Range" />
-              <Reveal delay={0.1}>
-                <Link
-                  to="/products"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-ink-950 border-b-2 border-gold-500 pb-1 hover:text-gold-600 transition-colors whitespace-nowrap"
-                >
-                  View All
-                  <Icon name="arrow-right" size={15} />
-                </Link>
-              </Reveal>
+            <div className="flex items-center justify-end mb-8">
+              <Link
+                to="/products"
+                className="inline-flex items-center gap-2 text-sm font-semibold text-ink-950 border-b-2 border-gold-500 pb-1 hover:text-gold-600 transition-colors whitespace-nowrap"
+              >
+                View All
+                <Icon name="arrow-right" size={15} />
+              </Link>
             </div>
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {bestSellers.map((product, i) => (
                 <Reveal key={product._id} delay={i * 0.05}>
-                  <ProductCard product={product} featured />
+                  <ProductCard product={product} />
                 </Reveal>
               ))}
             </div>
