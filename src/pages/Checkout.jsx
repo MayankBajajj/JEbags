@@ -134,21 +134,23 @@ export default function Checkout() {
           </form>
         </div>
 
-        <div className="lg:sticky lg:top-28 bg-white rounded-2xl border border-ink-900/10 p-6">
-          <h2 className="font-display font-semibold text-lg text-ink-950 mb-4">Order Summary</h2>
-          <div className="space-y-3 mb-4">
-            {items.map((item) => (
-              <div key={item.productId} className="flex justify-between text-sm">
-                <span className="text-ink-700">
-                  {item.name} × {item.quantity}
-                </span>
-                <span className="text-ink-950">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
-              </div>
-            ))}
-          </div>
-          <div className="border-t border-ink-900/10 pt-4 flex justify-between font-display font-semibold text-ink-950">
-            <span>Total</span>
-            <span>₹{totalAmount.toLocaleString("en-IN")}</span>
+        <div className="lg:sticky lg:top-28">
+          <h2 className="font-display font-semibold text-3xl text-ink-950 mb-6">Order Summary</h2>
+          <div className="bg-white rounded-2xl border border-ink-900/10 p-6">
+            <div className="space-y-3 mb-4">
+              {items.map((item) => (
+                <div key={item.productId} className="flex justify-between text-sm">
+                  <span className="text-ink-700">
+                    {item.name} × {item.quantity}
+                  </span>
+                  <span className="text-ink-950">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                </div>
+              ))}
+            </div>
+            <div className="border-t border-ink-900/10 pt-4 flex justify-between font-display font-semibold text-ink-950">
+              <span>Total</span>
+              <span>₹{totalAmount.toLocaleString("en-IN")}</span>
+            </div>
           </div>
         </div>
       </div>
