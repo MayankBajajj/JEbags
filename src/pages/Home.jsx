@@ -9,6 +9,7 @@ import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
 import ProductCard from "../components/ProductCard";
 import ClientStrip from "../components/ClientStrip";
+import Button from "../components/Button";
 import { whyUs, company, industries, exportCapabilities, clients } from "../data/content";
 import { api } from "../lib/api";
 
@@ -40,19 +41,24 @@ export default function Home() {
 
   return (
     <>
-      <Hero />
-      <TrustStrip />
+      <div className="flex flex-col min-h-dvh sm:min-h-0 sm:block">
+        <Hero />
+        <TrustStrip />
+      </div>
 
       {/* Product categories */}
       <section className="py-20 sm:py-24 bg-cream-50">
         <div className="max-w-7xl mx-auto px-5 sm:px-8">
-          <div className="flex items-center justify-end mb-8">
+          <div className="flex items-center justify-between mb-8">
+            <span className="inline-block text-xs tracking-[0.25em] font-semibold text-gold-600 uppercase">
+              Our Product Categories
+            </span>
             <Link
               to="/products"
-              className="inline-flex items-center gap-2 text-sm font-semibold text-gold-600 hover:text-gold-700 transition-colors whitespace-nowrap"
+              className="group inline-flex items-center gap-2 text-sm font-semibold text-gold-600 hover:text-gold-700 transition-colors whitespace-nowrap"
             >
               View All Products
-              <Icon name="arrow-right" size={15} />
+              <Icon name="arrow-right" size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
             </Link>
           </div>
           <CategoryShowcase count={6} />
@@ -144,13 +150,9 @@ export default function Home() {
                 </div>
               ))}
             </div>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-7 py-3.5 text-sm font-semibold text-ink-950 hover:bg-gold-400 transition-colors w-fit"
-            >
+            <Button to="/contact" variant="primary" className="w-fit">
               Enquire for Export
-              <Icon name="arrow-right" size={16} />
-            </Link>
+            </Button>
           </Reveal>
           <Reveal delay={0.1} className="hidden lg:flex items-center justify-center">
             <GlobeArt className="w-full max-w-md text-cream-100/70" />
@@ -162,16 +164,19 @@ export default function Home() {
       {bestSellers && bestSellers.length > 0 && (
         <section className="py-20 sm:py-24 bg-cream-50">
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-            <div className="flex items-center justify-end mb-8">
+            <div className="flex items-center justify-between mb-8">
+              <span className="inline-block text-xs tracking-[0.25em] font-semibold text-gold-600 uppercase">
+                Featured Products
+              </span>
               <Link
                 to="/products"
-                className="inline-flex items-center gap-2 text-sm font-semibold text-ink-950 border-b-2 border-gold-500 pb-1 hover:text-gold-600 transition-colors whitespace-nowrap"
+                className="group inline-flex items-center gap-2 text-sm font-semibold text-ink-950 border-b-2 border-gold-500 pb-1 hover:text-gold-600 transition-colors whitespace-nowrap"
               >
                 View All
-                <Icon name="arrow-right" size={15} />
+                <Icon name="arrow-right" size={15} className="transition-transform duration-300 group-hover:translate-x-1" />
               </Link>
             </div>
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {bestSellers.map((product, i) => (
                 <Reveal key={product._id} delay={i * 0.05}>
                   <ProductCard product={product} />
@@ -206,7 +211,7 @@ export default function Home() {
       </section>
 
       {/* Final CTA */}
-      <section className="py-16 sm:py-20 bg-gold-500">
+      <section className="py-16 sm:py-20 bg-beige-100">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-7 text-center sm:text-left">
           <Reveal>
             <h2 className="font-display font-semibold text-2xl sm:text-3xl text-ink-950 leading-snug">
@@ -217,19 +222,12 @@ export default function Home() {
             </p>
           </Reveal>
           <Reveal delay={0.1} className="flex flex-wrap items-center gap-3 shrink-0">
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-ink-950 px-7 py-3.5 text-sm font-semibold text-cream-50 hover:bg-ink-800 transition-colors"
-            >
+            <Button to="/contact" variant="dark">
               Request a Quote
-              <Icon name="arrow-right" size={16} />
-            </Link>
-            <a
-              href={`tel:${company.phoneRaw}`}
-              className="inline-flex items-center gap-2 rounded-full border border-ink-950/30 px-7 py-3.5 text-sm font-semibold text-ink-950 hover:bg-ink-950/5 transition-colors"
-            >
+            </Button>
+            <Button href={`tel:${company.phoneRaw}`} variant="outline" icon={null}>
               Contact Our Team
-            </a>
+            </Button>
           </Reveal>
         </div>
       </section>

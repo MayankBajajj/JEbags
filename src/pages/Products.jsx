@@ -1,18 +1,29 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
+import Button from "../components/Button";
 import ProductCard from "../components/ProductCard";
 import { categoryGroups } from "../data/content";
 import { api } from "../lib/api";
+import heroVideo from "../assets/videos/hero-video.mp4";
 
 export default function Products() {
+  const [searchParams] = useSearchParams();
+  const tabs = ["All", ...categoryGroups.map((g) => g.title)];
   const [active, setActive] = useState("All");
   const [searchInput, setSearchInput] = useState("");
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState(null);
   const [error, setError] = useState("");
-  const tabs = ["All", ...categoryGroups.map((g) => g.title)];
+
+  // Lets links like /products?category=X (e.g. from the navbar dropdown) land
+  // on the right tab, including when navigating here while already on this page.
+  useEffect(() => {
+    const fromUrl = searchParams.get("category");
+    setActive(fromUrl && tabs.includes(fromUrl) ? fromUrl : "All");
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchParams]);
 
   // Debounce search input so we're not firing a request on every keystroke.
   useEffect(() => {
@@ -35,7 +46,16 @@ export default function Products() {
 
   return (
     <>
-      <section className="bg-beige-100 pt-40 pb-14 sm:pt-48 sm:pb-16 relative overflow-hidden">
+      <section className="bg-beige-100 pt-28 pb-10 sm:pt-48 sm:pb-16 relative overflow-hidden">
+        <video
+          className="absolute inset-0 w-full h-full object-cover scale-110 sm:scale-100 opacity-[0.45] will-change-transform"
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        <div className="absolute inset-0 bg-beige-100/55" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(184,135,92,0.16),_transparent_55%)]" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 relative">
           <Reveal>
@@ -43,7 +63,7 @@ export default function Products() {
               Product Range
             </span>
             <h1 className="font-display font-semibold text-4xl sm:text-6xl text-ink-950 leading-[1.05] max-w-2xl">
-              Bags engineered for every category.
+              Bags engineered for <span className="text-gold-600">every category.</span>
             </h1>
             <p className="mt-5 text-ink-700 text-base sm:text-lg max-w-xl leading-relaxed">
               Every piece below is available as OEM, ODM, private-label, or fully custom-built.
@@ -71,10 +91,10 @@ export default function Products() {
               <button
                 key={tab}
                 onClick={() => setActive(tab)}
-                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-colors border ${
+                className={`px-5 py-2.5 rounded-full text-sm font-medium transition-all duration-200 border ${
                   active === tab
                     ? "bg-ink-950 text-cream-50 border-ink-950"
-                    : "border-ink-900/15 text-ink-700 hover:border-gold-500 hover:text-gold-600"
+                    : "border-ink-900/15 text-ink-700 hover:border-gold-500 hover:text-gold-600 hover:scale-105"
                 }`}
               >
                 {tab}
@@ -103,7 +123,7 @@ export default function Products() {
               </p>
             </div>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
               {products.map((product, i) => (
                 <Reveal key={product._id} delay={i * 0.04}>
                   <ProductCard product={product} />
@@ -116,44 +136,40 @@ export default function Products() {
 
       {/* OEM/ODM strip */}
       <section className="bg-beige-100 py-16 sm:py-20">
-        <div className="max-w-7xl mx-auto px-5 sm:px-8 grid sm:grid-cols-2 gap-6">
-          <Reveal className="flex items-start gap-4 rounded-2xl border border-gold-500/30 bg-cream-50 p-7">
-            <Icon name="settings-2" size={22} className="text-gold-600 shrink-0 mt-1" />
-            <div>
-              <h3 className="font-display font-semibold text-lg text-ink-950 mb-1.5">
-                OEM Manufacturing
-              </h3>
-              <p className="text-sm text-ink-700 leading-relaxed">
-                Send your specs — we manufacture to your exact requirements, at scale.
-              </p>
-            </div>
-          </Reveal>
-          <Reveal delay={0.1} className="flex items-start gap-4 rounded-2xl border border-gold-500/30 bg-cream-50 p-7">
-            <Icon name="pen-tool" size={22} className="text-gold-600 shrink-0 mt-1" />
-            <div>
-              <h3 className="font-display font-semibold text-lg text-ink-950 mb-1.5">
-                ODM Solutions
-              </h3>
-              <p className="text-sm text-ink-700 leading-relaxed">
-                Have a concept? Our team helps design and develop it from scratch.
-              </p>
-            </div>
-          </Reveal>
-        </div>
-      </section>
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 space-y-14 sm:space-y-16">
+          <div className="grid sm:grid-cols-2 gap-6">
+            <Reveal className="flex items-start gap-4 rounded-2xl border border-gold-500/30 bg-cream-50 p-7">
+              <Icon name="settings-2" size={22} className="text-gold-600 shrink-0 mt-1" />
+              <div>
+                <h3 className="font-display font-semibold text-lg text-ink-950 mb-1.5">
+                  OEM Manufacturing
+                </h3>
+                <p className="text-sm text-ink-700 leading-relaxed">
+                  Send your specs — we manufacture to your exact requirements, at scale.
+                </p>
+              </div>
+            </Reveal>
+            <Reveal delay={0.1} className="flex items-start gap-4 rounded-2xl border border-gold-500/30 bg-cream-50 p-7">
+              <Icon name="pen-tool" size={22} className="text-gold-600 shrink-0 mt-1" />
+              <div>
+                <h3 className="font-display font-semibold text-lg text-ink-950 mb-1.5">
+                  ODM Solutions
+                </h3>
+                <p className="text-sm text-ink-700 leading-relaxed">
+                  Have a concept? Our team helps design and develop it from scratch.
+                </p>
+              </div>
+            </Reveal>
+          </div>
 
-      <section className="py-24 sm:py-28 bg-ink-950">
-        <div className="max-w-5xl mx-auto px-5 sm:px-8 flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
-          <h3 className="font-display font-semibold text-2xl sm:text-3xl text-cream-50">
-            Don't see your exact requirement?
-          </h3>
-          <Link
-            to="/contact"
-            className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-7 py-3.5 text-sm font-semibold text-ink-950 hover:bg-gold-400 transition-colors whitespace-nowrap"
-          >
-            Talk to Our Team
-            <Icon name="arrow-right" size={16} />
-          </Link>
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-6 text-center sm:text-left">
+            <h3 className="font-display font-semibold text-2xl sm:text-3xl text-ink-950">
+              Don't see your exact requirement?
+            </h3>
+            <Button to="/contact" variant="primary" className="whitespace-nowrap">
+              Talk to Our Team
+            </Button>
+          </div>
         </div>
       </section>
     </>

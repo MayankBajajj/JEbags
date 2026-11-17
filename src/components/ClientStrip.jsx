@@ -38,14 +38,23 @@ export default function ClientStrip({ items }) {
             return (
               <div
                 key={i}
-                className="shrink-0 flex items-center justify-center rounded-xl bg-cream-50 px-7 h-16 sm:h-[4.5rem] min-w-[150px]"
+                className="shrink-0 flex flex-col items-center justify-center gap-1 rounded-xl bg-cream-50 px-7 h-16 sm:h-[4.5rem] min-w-[150px]"
               >
                 {logoSrc ? (
-                  <img
-                    src={logoSrc}
-                    alt={item.name}
-                    className="max-h-8 sm:max-h-9 max-w-[140px] object-contain"
-                  />
+                  <>
+                    <img
+                      src={logoSrc}
+                      alt={item.name}
+                      className={`max-w-[140px] object-contain ${
+                        item.showName ? "max-h-5 sm:max-h-6" : "max-h-8 sm:max-h-9"
+                      }`}
+                    />
+                    {item.showName && (
+                      <span className="text-[11px] font-display font-semibold text-ink-900 whitespace-nowrap">
+                        {item.name}
+                      </span>
+                    )}
+                  </>
                 ) : (
                   <span className="text-sm font-display font-medium text-ink-900 whitespace-nowrap">
                     {item.name}

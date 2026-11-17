@@ -5,7 +5,7 @@ import { company, navLinks } from "../data/content";
 
 export default function Footer() {
   return (
-    <footer className="bg-ink-950 text-cream-100 pt-16 pb-8 relative overflow-hidden">
+    <footer className="bg-ink-950 text-cream-100 pt-16 pb-8 relative overflow-hidden border-t border-cream-100/20">
       <div className="absolute -top-24 -right-24 w-80 h-80 rounded-full bg-gold-500/10 blur-3xl" />
       <div className="max-w-7xl mx-auto px-5 sm:px-8 relative">
         <div className="grid md:grid-cols-[1.4fr_1fr_1fr] gap-12 pb-12 border-b border-ink-700">

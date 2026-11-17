@@ -1,13 +1,13 @@
-import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import Icon from "./Icon";
+import Button from "./Button";
+import BagGridReveal from "./BagGridReveal";
 import heroVideo from "../assets/videos/hero-video.mp4";
 
 export default function Hero() {
   return (
-    <section className="relative overflow-hidden bg-cream-50 pt-40 pb-14 sm:pt-48 sm:pb-16">
+    <section className="relative bg-cream-50 pt-28 pb-12 sm:pt-44 sm:pb-16 lg:pt-32 lg:pb-10 flex-1 sm:flex-none flex flex-col justify-center overflow-hidden">
       <video
-        className="absolute inset-0 w-full h-full object-cover opacity-[0.45]"
+        className="absolute inset-0 w-full h-full object-cover scale-110 sm:scale-100 opacity-[0.45] will-change-transform"
         src={heroVideo}
         autoPlay
         muted
@@ -17,47 +17,47 @@ export default function Hero() {
       <div className="absolute inset-0 bg-cream-50/55" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(200,154,63,0.14),_transparent_55%)]" />
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 relative">
+      <div className="max-w-7xl mx-auto px-5 sm:px-8 relative grid lg:grid-cols-[50%_50%] gap-12 lg:gap-8 items-center">
         <motion.div
+          className="lg:-translate-x-6 xl:-translate-x-8"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
-          className="max-w-2xl"
         >
           <span className="text-xs tracking-[0.25em] font-semibold uppercase text-gold-600">
             Custom Bags. Global Possibilities.
           </span>
 
-          <h1 className="mt-5 font-display font-black uppercase text-[11vw] sm:text-6xl md:text-7xl leading-[0.98] tracking-tight text-ink-950">
-            Built to Carry
-            <br />
-            <span className="text-gold-600">the World</span>
+          <h1 className="mt-4 lg:mt-4 font-display font-black uppercase text-[11vw] sm:text-6xl md:text-7xl lg:text-4xl xl:text-[2.75rem] leading-[1.05] tracking-tight text-ink-950">
+            Built to Carry <span className="text-gold-600">the World</span>
           </h1>
 
-          <p className="mt-6 text-sm sm:text-base tracking-[0.15em] uppercase font-medium text-ink-800">
+          <p className="mt-4 lg:mt-4 text-sm sm:text-base tracking-[0.15em] uppercase font-medium text-ink-800">
             OEM &nbsp;|&nbsp; ODM &nbsp;|&nbsp; Private Label &nbsp;|&nbsp; Corporate Gifting
           </p>
 
-          <p className="mt-5 text-base leading-relaxed max-w-lg text-ink-700">
+          <p className="mt-4 lg:mt-4 text-base leading-relaxed max-w-lg text-ink-700">
             From concept to bulk production, we deliver high-quality, customised bag solutions
             for brands, institutions, and global businesses.
           </p>
 
-          <div className="mt-9 flex flex-wrap items-center gap-4">
-            <Link
-              to="/products"
-              className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-7 py-3.5 text-sm font-semibold text-ink-950 hover:bg-gold-400 transition-colors"
-            >
+          <div className="mt-7 lg:mt-6 flex flex-wrap items-center gap-4">
+            <Button to="/products" variant="primary">
               Explore Our Products
-              <Icon name="arrow-right" size={16} />
-            </Link>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-full border px-7 py-3.5 text-sm font-semibold transition-colors border-ink-900/25 text-ink-900 hover:border-gold-600 hover:text-gold-700"
-            >
+            </Button>
+            <Button to="/contact" variant="outline" icon={null}>
               Request a Quote
-            </Link>
+            </Button>
           </div>
+        </motion.div>
+
+        <motion.div
+          className="lg:translate-x-6 xl:translate-x-10 lg:-translate-y-6"
+          initial={{ opacity: 0, scale: 0.92 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
+        >
+          <BagGridReveal />
         </motion.div>
       </div>
     </section>

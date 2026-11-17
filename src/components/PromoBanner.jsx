@@ -1,6 +1,5 @@
-import { Link } from "react-router-dom";
 import Reveal from "./Reveal";
-import Icon from "./Icon";
+import Button from "./Button";
 import ProductArt from "./ProductArt";
 
 export default function PromoBanner() {
@@ -25,13 +24,9 @@ export default function PromoBanner() {
               From employee welcome kits to conference merchandise — manufactured and
               branded end-to-end.
             </p>
-            <Link
-              to="/contact"
-              className="inline-flex items-center gap-2 rounded-full bg-gold-500 px-6 py-3 text-sm font-semibold text-ink-950 hover:bg-gold-400 transition-colors w-fit"
-            >
+            <Button to="/contact" variant="primary" size="sm" className="w-fit">
               Get a Quote
-              <Icon name="arrow-right" size={15} />
-            </Link>
+            </Button>
           </div>
         </div>
       </div>

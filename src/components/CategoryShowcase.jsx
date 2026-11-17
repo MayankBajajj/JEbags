@@ -33,12 +33,15 @@ export default function CategoryShowcase({ count = 6 }) {
                 alt={group.title}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />
-              <span className="absolute bottom-2.5 right-2.5 w-8 h-8 rounded-full bg-cream-50 border border-ink-900/10 flex items-center justify-center group-hover:bg-ink-950 transition-colors">
-                <Icon name="arrow-right" size={14} className="text-ink-900 group-hover:text-cream-50 transition-colors" />
+              <span className="pointer-events-none select-none absolute left-2 top-0 font-display font-bold text-5xl sm:text-6xl text-cream-50/30 leading-none">
+                {String(i + 1).padStart(2, "0")}
+              </span>
+              <span className="absolute bottom-2.5 right-2.5 w-8 h-8 rounded-full bg-cream-50 border border-ink-900/10 flex items-center justify-center group-hover:bg-ink-950 group-hover:scale-110 transition-all duration-300">
+                <Icon name="arrow-right" size={14} className="text-ink-900 group-hover:text-cream-50 group-hover:translate-x-0.5 transition-all duration-300" />
               </span>
             </div>
-            <h3 className="mt-3 text-sm font-semibold text-ink-950 leading-tight">{group.title}</h3>
-            <p className="mt-0.5 text-xs text-ink-700/70 leading-tight">
+            <h3 className="mt-2.5 sm:mt-3 text-sm font-semibold text-ink-950 leading-tight line-clamp-1">{group.title}</h3>
+            <p className="mt-0.5 text-xs text-ink-700/70 leading-tight line-clamp-1 sm:line-clamp-2">
               {group.items.slice(0, 3).join(" | ")}
             </p>
           </Link>

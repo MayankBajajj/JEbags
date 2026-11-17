@@ -1,8 +1,32 @@
 import { useState } from "react";
+import { Link } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
-import { company } from "../data/content";
+import Button from "../components/Button";
+import ClientStrip from "../components/ClientStrip";
+import { company, clients } from "../data/content";
 import { api, ApiError } from "../lib/api";
+
+const reasons = [
+  {
+    icon: "settings-2",
+    title: "Bulk & OEM Orders",
+    description: "Send your specs and quantities — we'll scope production and lead time.",
+    to: "/products",
+  },
+  {
+    icon: "gift",
+    title: "Corporate Gifting",
+    description: "Custom-branded bags for onboarding kits, events, and client gifting.",
+    to: `/products?category=${encodeURIComponent("Corporate Gifting & Events")}`,
+  },
+  {
+    icon: "globe",
+    title: "Export Enquiries",
+    description: "Importers, distributors, and international retailers — let's talk supply.",
+    to: "/about#capabilities",
+  },
+];
 
 const inputClasses =
   "w-full rounded-xl border border-ink-900/15 bg-white px-4 py-3 text-sm text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 transition-all";
@@ -33,7 +57,7 @@ export default function Contact() {
 
   return (
     <>
-      <section className="bg-beige-100 pt-40 pb-20 sm:pt-48 sm:pb-24 relative overflow-hidden">
+      <section className="bg-beige-100 pt-28 pb-14 sm:pt-48 sm:pb-24 relative overflow-hidden">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_rgba(184,135,92,0.16),_transparent_55%)]" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 relative">
           <Reveal>
@@ -41,7 +65,7 @@ export default function Contact() {
               Get in Touch
             </span>
             <h1 className="font-display font-semibold text-4xl sm:text-6xl text-ink-950 leading-[1.05] max-w-2xl">
-              Let's talk about your next order.
+              Let's talk about <span className="text-gold-600">your next order.</span>
             </h1>
             <p className="mt-6 text-ink-700 text-base sm:text-lg max-w-xl leading-relaxed">
               Whether it's a bulk order, a custom OEM project, or corporate gifting at scale —
@@ -51,7 +75,39 @@ export default function Contact() {
         </div>
       </section>
 
-      <section className="bg-cream-50 py-20 sm:py-24">
+      {/* Reasons to reach out */}
+      <section className="bg-cream-50 pt-16 sm:pt-20 pb-4">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8 grid sm:grid-cols-3 gap-5">
+          {reasons.map((item, i) => (
+            <Reveal key={item.title} delay={i * 0.06}>
+              <Link
+                to={item.to}
+                className="group relative overflow-hidden flex flex-col rounded-2xl border border-ink-900/10 bg-white p-7 h-full hover:border-gold-500/50 hover:shadow-lg hover:shadow-ink-900/5 hover:-translate-y-0.5 transition-all duration-300"
+              >
+                <Icon
+                  name={item.icon}
+                  size={84}
+                  strokeWidth={1.2}
+                  className="pointer-events-none select-none absolute -right-3 -top-3 text-ink-900/[0.045]"
+                />
+                <div className="relative w-12 h-12 rounded-xl bg-beige-200/70 flex items-center justify-center mb-5">
+                  <Icon name={item.icon} size={22} className="text-gold-600" />
+                </div>
+                <h3 className="relative font-display font-semibold text-lg text-ink-950 mb-1.5">
+                  {item.title}
+                </h3>
+                <p className="relative text-sm text-ink-700 leading-relaxed mb-4">{item.description}</p>
+                <span className="relative mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-gold-600 group-hover:text-gold-700">
+                  Learn more
+                  <Icon name="arrow-right" size={14} className="transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
+              </Link>
+            </Reveal>
+          ))}
+        </div>
+      </section>
+
+      <section className="bg-cream-50 pt-16 pb-20 sm:pb-24">
         <div className="max-w-7xl mx-auto px-5 sm:px-8 grid lg:grid-cols-[0.9fr_1.1fr] gap-12">
           {/* Contact info */}
           <Reveal className="space-y-5">
@@ -63,14 +119,22 @@ export default function Contact() {
               <a
                 key={item.label}
                 href={item.href ?? undefined}
-                className={`flex items-start gap-4 rounded-2xl border border-ink-900/10 bg-beige-100 p-7 ${
-                  item.href ? "hover:border-gold-500/50 hover:bg-cream-100 transition-colors" : ""
+                className={`relative overflow-hidden flex items-start gap-4 rounded-2xl border border-ink-900/10 bg-beige-100 p-7 ${
+                  item.href
+                    ? "hover:border-gold-500/50 hover:bg-cream-100 hover:-translate-y-0.5 hover:shadow-md hover:shadow-ink-900/5 transition-all duration-300"
+                    : ""
                 }`}
               >
-                <div className="w-12 h-12 rounded-xl bg-cream-50 border border-gold-500/20 flex items-center justify-center shrink-0">
+                <Icon
+                  name={item.icon}
+                  size={80}
+                  strokeWidth={1.2}
+                  className="pointer-events-none select-none absolute -right-3 -top-3 text-ink-900/[0.05]"
+                />
+                <div className="relative w-12 h-12 rounded-xl bg-cream-50 border border-gold-500/20 flex items-center justify-center shrink-0">
                   <Icon name={item.icon} size={20} className="text-gold-600" />
                 </div>
-                <div>
+                <div className="relative">
                   <p className="text-xs tracking-[0.2em] text-gold-600 uppercase font-semibold mb-1.5">
                     {item.label}
                   </p>
@@ -194,20 +258,48 @@ export default function Contact() {
                       {error}
                     </p>
                   )}
-                  <button
+                  <Button
                     type="submit"
                     disabled={submitting}
-                    className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-ink-950 px-7 py-4 text-sm font-semibold text-cream-50 hover:bg-ink-800 transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                    variant="dark"
+                    icon={submitting ? null : "arrow-right"}
+                    className="w-full"
                   >
                     {submitting ? "Sending..." : "Send Message"}
-                    <Icon name="arrow-right" size={16} />
-                  </button>
+                  </Button>
                 </form>
               )}
             </div>
           </Reveal>
         </div>
       </section>
+
+      {/* Location */}
+      <section className="bg-cream-50 pb-20 sm:pb-24">
+        <div className="max-w-7xl mx-auto px-5 sm:px-8">
+          <Reveal>
+            <span className="inline-block text-xs tracking-[0.25em] font-semibold text-gold-600 uppercase mb-3">
+              Find Us
+            </span>
+            <h2 className="font-display font-semibold text-2xl sm:text-3xl text-ink-950 mb-6">
+              {company.address}
+            </h2>
+            <div className="rounded-2xl overflow-hidden border border-ink-900/10 h-72 sm:h-96">
+              <iframe
+                title="JE Bags location on Google Maps"
+                src={`https://www.google.com/maps?q=${encodeURIComponent(company.address)}&output=embed`}
+                width="100%"
+                height="100%"
+                style={{ border: 0 }}
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
+      <ClientStrip items={clients} />
     </>
   );
 }

@@ -17,45 +17,82 @@ export const capabilities = [
     title: "OEM Manufacturing",
     description:
       "Production based on client designs, drawings, specifications, and branding requirements.",
+    detail:
+      "Our in-house facility handles cutting, printing, stitching, and finishing under one roof, so your specifications are followed precisely at every stage of production.",
   },
   {
     icon: "pen-tool",
     title: "ODM Solutions",
     description:
       "Product development and design support to help brands bring new bag concepts to market.",
+    detail:
+      "From initial sketches to functional prototypes, our design team helps shape a concept into a manufacturable, market-ready product.",
   },
   {
     icon: "shield-check",
     title: "Private-Label Manufacturing",
     description:
       "Customized products manufactured for brands under their own labels.",
+    detail:
+      "Your branding goes on bags built to our standard quality and construction, with no compromise on durability.",
   },
   {
     icon: "warehouse",
     title: "Bulk & Institutional Manufacturing",
     description:
       "Large-volume orders for businesses, educational institutions, retailers, and organizations.",
+    detail:
+      "Production scales to match institutional timelines, with consistent sizing, materials, and finish across the full order.",
   },
   {
     icon: "gift",
     title: "Corporate Gifting Solutions",
     description:
       "Customized bags and merchandise for corporate campaigns, employee onboarding, events, and promotions.",
+    detail:
+      "Branded bags, kits, and merchandise are produced and packaged ready for distribution at your event or onboarding program.",
   },
   {
     icon: "layers",
     title: "Custom Product Development",
     description:
       "Tailored materials, colours, components, branding, and functional features to suit specific requirements.",
+    detail:
+      "We work through material, colour, and feature options with you before committing to bulk production, so there are no surprises later.",
   },
 ];
 
 export const whyUs = [
-  { icon: "factory", title: "Manufacturing Excellence", description: "Disciplined production standards across every order size." },
-  { icon: "shield", title: "Product Durability", description: "Built with materials and construction made to last." },
-  { icon: "boxes", title: "Functional Design", description: "Form follows function — every bag engineered for its purpose." },
-  { icon: "sparkles", title: "Customization", description: "Materials, colours, branding and features tailored to you." },
-  { icon: "truck", title: "Dependable Delivery", description: "Scalable production that keeps pace with your timelines." },
+  {
+    icon: "factory",
+    title: "Manufacturing Excellence",
+    description: "Disciplined production standards across every order size.",
+    detail: "Every production line follows the same checklist, whether the order is fifty units or fifty thousand.",
+  },
+  {
+    icon: "shield",
+    title: "Product Durability",
+    description: "Built with materials and construction made to last.",
+    detail: "Materials and stitching are chosen for everyday wear, not just how a sample looks on day one.",
+  },
+  {
+    icon: "boxes",
+    title: "Functional Design",
+    description: "Form follows function — every bag engineered for its purpose.",
+    detail: "We review how a bag will actually be carried and used before finalising its construction.",
+  },
+  {
+    icon: "sparkles",
+    title: "Customization",
+    description: "Materials, colours, branding and features tailored to you.",
+    detail: "Fabric, colour, hardware, and branding can all be adjusted to match your specification sheet.",
+  },
+  {
+    icon: "truck",
+    title: "Dependable Delivery",
+    description: "Scalable production that keeps pace with your timelines.",
+    detail: "Production schedules are planned around your deadline, not the other way around.",
+  },
 ];
 
 export const processSteps = [
@@ -109,10 +146,116 @@ export const categoryGroups = [
   },
 ];
 
+export const howWeWorkSteps = [
+  {
+    id: "material-sourcing",
+    icon: "warehouse",
+    title: "Material Sourcing",
+    description:
+      "Fabrics, linings, zippers, and hardware sourced and quality-checked before production begins.",
+    detail:
+      "Every fabric, lining, and hardware component is inspected on arrival, before it's cleared for cutting. We check for colour consistency across the batch, fabric weight and weave, and that zippers, buckles, and rivets match the approved sample — not just a general spec sheet. Anything that doesn't meet the grade gets sent back before it ever touches the cutting table, so problems are caught at the cheapest possible point to fix them.",
+  },
+  {
+    id: "pattern-making",
+    icon: "ruler",
+    title: "Pattern Making",
+    description: "Technical patterns drafted and graded to your exact specifications and sizing.",
+    detail:
+      "Patterns are graded across sizes so fit and proportions stay consistent across an entire order. Our pattern team works directly from your reference design or sketch, translating it into technical panels, seam allowances, and hardware placement points. Each pattern is test-cut once before it's approved for bulk cutting, so sizing issues get caught on paper and fabric, not after a thousand units are already cut.",
+  },
+  {
+    id: "design-sampling",
+    icon: "pen-tool",
+    title: "Bag Designing & Sampling",
+    description: "Concepts developed into physical prototypes for approval before bulk production.",
+    detail:
+      "A physical sample is approved before a single unit goes into bulk production. This is where a sketch or reference photo becomes a real, holdable bag — compartment sizes, strap placement, zipper pull quality, and stitching detail are all finalised here. You get to handle the actual sample, request changes, and sign off before we commit any material or labour to a full run.",
+  },
+  {
+    id: "fabric-cutting",
+    icon: "scissors",
+    title: "Fabric Cutting",
+    description: "Precision cutting to minimise wastage and ensure consistency across every panel.",
+    detail:
+      "Panels are cut in bulk using approved patterns, keeping wastage and sizing variance to a minimum. Fabric is layered and cut in stacks, so every panel in the order — whether it's 50 units or 5,000 — comes from the same precise template. This is also where fabric grain direction and pattern alignment (for printed or textured materials) get checked, so panels match correctly once assembled.",
+  },
+  {
+    id: "printing-embroidery",
+    icon: "printer",
+    title: "Printing & Embroidery",
+    description: "Logos and branding applied via screen printing, digital printing, or embroidery.",
+    detail:
+      "Logo placement and colour are checked against your brand guidelines before full production begins. We run a test print or stitch-out first to confirm size, placement, thread colour match, and finish quality on the actual fabric — not a mockup — since the same logo can look different on canvas versus nylon. Once that's approved, branding is applied in bulk with consistent placement across every unit.",
+  },
+  {
+    id: "stitching-assembly",
+    icon: "settings-2",
+    title: "Stitching & Assembly",
+    description: "Skilled machine operators assemble each bag with reinforced, durable stitching.",
+    detail:
+      "Reinforced stitching is used at stress points — handles, zippers, and seams — for everyday durability. Panels, linings, pockets, and hardware are assembled in sequence by operators trained on that specific bag style, not a generalist line. Stitch density and thread tension are checked periodically through the run, since a bag that looks fine on day one needs to hold up after months of actual use.",
+  },
+  {
+    id: "quality-control",
+    icon: "shield-check",
+    title: "Quality Control",
+    description: "In-line checks at every stage catch defects before they reach the next process.",
+    detail:
+      "Checks happen between stages, not just at the end, so defects are caught before more work is added on top. A stitching flaw is far cheaper to fix right after assembly than after the bag has already been through finishing, branding, and packaging. In-line checks mean fewer units get rejected at the final stage, which keeps both quality and delivery timelines predictable.",
+  },
+  {
+    id: "finishing",
+    icon: "sparkles",
+    title: "Finishing",
+    description: "Thread trimming, pressing, and detailing for a clean, retail-ready appearance.",
+    detail:
+      "Loose threads are trimmed, surfaces cleaned, and every unit aligned to the approved sample. This stage also covers shaping bags on presses so panels sit flat and corners hold their form, plus a final check that every zipper pull, buckle, and label is seated correctly. It's the difference between a bag that's technically finished and one that actually looks retail-ready out of the bag.",
+  },
+  {
+    id: "final-inspection",
+    icon: "clipboard-check",
+    title: "Final Inspection",
+    description: "A complete pre-dispatch audit against your approved sample and specifications.",
+    detail:
+      "A complete unit-by-unit audit against your approved sample before anything is packed. This covers stitching integrity, hardware function (every zipper gets pulled, every buckle gets clipped), colour consistency across the batch, and a side-by-side comparison with the signed-off sample. Anything that doesn't match gets pulled from the batch rather than shipped and discovered by your customer.",
+  },
+  {
+    id: "packaging-dispatch",
+    icon: "package",
+    title: "Packaging & Dispatch",
+    description: "Secure packaging and dispatch coordination for on-time delivery, anywhere.",
+    detail:
+      "Bags are packed to prevent transit damage, with dispatch coordinated to your delivery timeline. Each unit is bagged or boxed individually where needed, then cartoned for bulk shipment with void-fill to stop movement in transit. For export orders, we coordinate documentation and carrier scheduling alongside packing, so the physical and paperwork sides of dispatch move together instead of one holding up the other.",
+  },
+];
+
 export const navLinks = [
   { label: "Home", to: "/" },
-  { label: "Products", to: "/products" },
-  { label: "About Us", to: "/about" },
+  {
+    label: "Products",
+    to: "/products",
+    dropdown: categoryGroups.map((g) => ({
+      label: g.title,
+      to: `/products?category=${encodeURIComponent(g.title)}`,
+    })),
+  },
+  { label: "Custom Build", to: "/custom-build" },
+  {
+    label: "How We Work",
+    to: "/how-we-work",
+    dropdown: howWeWorkSteps.map((s) => ({ label: s.title, to: `/how-we-work#${s.id}` })),
+  },
+  {
+    label: "About Us",
+    to: "/about",
+    dropdown: [
+      { label: "About Us", to: "/about" },
+      { label: "Capabilities", to: "/about#capabilities" },
+      { label: "What Sets Us Apart", to: "/about#why-us" },
+      { label: "Mission & Vision", to: "/about#mission" },
+    ],
+  },
   { label: "Contact", to: "/contact" },
 ];
 
@@ -124,7 +267,7 @@ export const clients = [
   { name: "Suzuki", logo: "suzuki" },
   { name: "Shipsy", logo: "shipsy" },
   { name: "Invergy", logo: "invergy" },
-  { name: "DeliveryPlus", logo: "deliveryplus" },
+  { name: "DeliveryPlus", logo: "deliveryplus", showName: true },
   { name: "Oliveware", logo: "oliveware" },
   { name: "Physics Wallah", logo: "physicswallah" },
   { name: "Yes Madam", logo: "yesmadam" },

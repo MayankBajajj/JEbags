@@ -34,6 +34,11 @@ import {
   Globe,
   Handshake,
   Award,
+  Ruler,
+  Scissors,
+  Printer,
+  ClipboardCheck,
+  ChevronDown,
 } from "lucide-react";
 
 const map = {
@@ -72,6 +77,11 @@ const map = {
   globe: Globe,
   handshake: Handshake,
   award: Award,
+  ruler: Ruler,
+  scissors: Scissors,
+  printer: Printer,
+  "clipboard-check": ClipboardCheck,
+  "chevron-down": ChevronDown,
 };
 
 export default function Icon({ name, className = "", size = 22, strokeWidth = 1.75 }) {
