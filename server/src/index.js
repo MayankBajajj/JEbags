@@ -15,6 +15,7 @@ import authRoutes from "./routes/auth.routes.js";
 import productRoutes from "./routes/product.routes.js";
 import orderRoutes from "./routes/order.routes.js";
 import enquiryRoutes from "./routes/enquiry.routes.js";
+import customBuildRoutes from "./routes/customBuild.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // server/src -> server/public (built frontend lives inside server/ so it
@@ -35,6 +36,7 @@ app.use("/api/auth", authRoutes);
 app.use("/api/products", productRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/enquiries", enquiryRoutes);
+app.use("/api/custom-build", customBuildRoutes);
 
 app.use("/api", notFound);
 

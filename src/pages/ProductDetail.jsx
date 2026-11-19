@@ -56,6 +56,10 @@ export default function ProductDetail() {
   };
 
   const handleRequestSample = () => {
+    if (!user) {
+      navigate("/login", { state: { from: { pathname: `/products/${slug}` } } });
+      return;
+    }
     addQuoteItem(product);
     openDrawer();
   };

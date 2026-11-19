@@ -9,6 +9,7 @@ const enquirySchema = new mongoose.Schema(
     type: { type: String, enum: ["bulk", "brand", "oem", "general"], default: "general" },
     estimatedQuantity: Number,
     message: { type: String, required: true },
+    photoUrl: { type: String },
     status: { type: String, enum: ["new", "contacted", "quoted", "closed"], default: "new" },
   },
   { timestamps: true }

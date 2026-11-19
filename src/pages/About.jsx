@@ -7,6 +7,7 @@ import Button from "../components/Button";
 import { capabilities, whyUs, company, clients } from "../data/content";
 import ClientStrip from "../components/ClientStrip";
 import factoryPhoto from "../assets/photos/factory-photo.png";
+import heroVideo from "../assets/videos/hero-video.mp4";
 
 function CapabilityCard({ cap, index }) {
   const [open, setOpen] = useState(false);
@@ -107,6 +108,15 @@ export default function About() {
   return (
     <>
       <section className="bg-beige-100 pt-28 pb-14 sm:pt-48 sm:pb-24 relative overflow-hidden">
+        <video
+          className="absolute inset-0 w-full h-full object-cover scale-110 sm:scale-100 opacity-[0.45] will-change-transform"
+          src={heroVideo}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        <div className="absolute inset-0 bg-beige-100/55" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(184,135,92,0.16),_transparent_55%)]" />
         <div className="max-w-7xl mx-auto px-5 sm:px-8 relative">
           <Reveal>
@@ -118,6 +128,88 @@ export default function About() {
             </h1>
             <p className="mt-6 text-ink-700 text-base sm:text-lg max-w-2xl leading-relaxed">
               {company.description}
+            </p>
+          </Reveal>
+        </div>
+      </section>
+
+      {/* Founder's Journey */}
+      <section className="bg-cream-50 py-20 sm:py-24">
+        <div className="max-w-4xl mx-auto px-5 sm:px-8">
+          <Reveal>
+            <span className="inline-block text-xs tracking-[0.25em] font-semibold text-gold-600 uppercase mb-3">
+              The Founder's Journey
+            </span>
+            <h2 className="font-display font-semibold text-3xl sm:text-4xl text-ink-950 leading-[1.1] mb-2">
+              Rohit Abii
+            </h2>
+            <p className="text-sm font-medium tracking-wide text-ink-700/70 uppercase mb-8">
+              Founder — JE Bags &amp; Corporate Gifting
+            </p>
+
+            <p className="text-lg sm:text-xl font-display text-ink-900 leading-relaxed mb-8 border-l-2 border-gold-500 pl-5">
+              Every business begins with a vision, but building one requires experience, passion,
+              and the courage to evolve.
+            </p>
+
+            <div className="space-y-5 text-ink-700 text-base leading-relaxed">
+              <p>
+                My entrepreneurial journey began over 8–10 years ago in the textile and fabric
+                industry, specialising in the import of fabrics, particularly materials used in
+                bag manufacturing. Over the years, this experience helped me develop a deep
+                understanding of fabric quality, sourcing, material specifications, market
+                requirements, and customer expectations.
+              </p>
+              <p>
+                With a strong foundation in the fabric industry, I saw an opportunity to take the
+                next step — moving beyond fabric sourcing into the manufacturing of finished
+                products.
+              </p>
+              <p>
+                This vision led to the establishment of JE Bags &amp; Corporate Gifting, where I
+                expanded my business into bag manufacturing alongside corporate gifting solutions.
+              </p>
+              <p>
+                What started as a corporate gifting business, offering a wide range of products to
+                companies across different industries, gradually evolved into a
+                manufacturing-driven enterprise. Today, we have been actively involved in bag
+                manufacturing for the past 2–3 years, developing products that combine
+                functionality, durability, quality, and brand identity.
+              </p>
+              <p>
+                From backpacks, laptop bags, travel bags and duffle bags to customised corporate
+                merchandise and bulk gifting solutions, our focus has always been on understanding
+                our clients' requirements and delivering products that meet their expectations.
+              </p>
+              <p>
+                Over time, we have had the opportunity to work with reputed organisations and
+                brands, strengthening our capabilities in product development, customisation,
+                bulk manufacturing, and corporate supply.
+              </p>
+            </div>
+
+            <h3 className="font-display font-semibold text-2xl text-ink-950 mt-12 mb-5">
+              My Vision
+            </h3>
+            <div className="space-y-5 text-ink-700 text-base leading-relaxed">
+              <p>
+                I believe that a successful business is not just about selling products; it is
+                about building trust, creating value, and developing long-term partnerships.
+              </p>
+              <p>
+                My vision is to establish JE Bags &amp; Corporate Gifting as a trusted name in the
+                corporate gifting and bag manufacturing industry, with a strong emphasis on
+                manufacturing excellence, innovation, quality, and customer satisfaction.
+              </p>
+              <p>
+                From importing fabrics to manufacturing finished products, the journey has been
+                about continuously evolving, creating opportunities, and building something
+                bigger.
+              </p>
+            </div>
+
+            <p className="mt-10 font-display font-semibold text-xl text-gold-600 tracking-wide">
+              Strong. Rising. Protected.
             </p>
           </Reveal>
         </div>

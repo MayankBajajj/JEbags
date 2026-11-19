@@ -1,11 +1,12 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Reveal from "../components/Reveal";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 import ClientStrip from "../components/ClientStrip";
 import { company, clients } from "../data/content";
 import { api, ApiError } from "../lib/api";
+import { useAuth } from "../context/AuthContext";
 
 const reasons = [
   {
@@ -31,8 +32,19 @@ const reasons = [
 const inputClasses =
   "w-full rounded-xl border border-ink-900/15 bg-white px-4 py-3 text-sm text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 transition-all";
 
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
 export default function Contact() {
-  const [form, setForm] = useState({ name: "", email: "", phone: "", company: "", message: "" });
+  const { user } = useAuth();
+  const navigate = useNavigate();
+  const [form, setForm] = useState({
+    name: user?.name || "",
+    email: user?.email || "",
+    phone: user?.phone || "",
+    company: "",
+    message: "",
+  });
+  const [photo, setPhoto] = useState(null);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
   const [submitting, setSubmitting] = useState(false);
@@ -41,12 +53,35 @@ export default function Contact() {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please attach an image file.");
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setError("Photo must be under 5MB.");
+      return;
+    }
+    setError("");
+    setPhoto(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      navigate("/login", { state: { from: { pathname: "/contact" } } });
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
-      await api.post("/enquiries", form);
+      const data = new FormData();
+      Object.entries(form).forEach(([key, value]) => data.append(key, value));
+      if (photo) data.append("photo", photo);
+
+      await api.post("/enquiries", data, { isForm: true });
       setSubmitted(true);
     } catch (err) {
       setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
@@ -172,6 +207,7 @@ export default function Contact() {
                     onClick={() => {
                       setSubmitted(false);
                       setForm({ name: "", email: "", phone: "", company: "", message: "" });
+                      setPhoto(null);
                     }}
                     className="mt-8 text-sm font-semibold text-gold-600 border-b-2 border-gold-500 pb-1"
                   >
@@ -253,9 +289,35 @@ export default function Contact() {
                       className={`${inputClasses} resize-none`}
                     />
                   </div>
+                  <label className="flex items-center gap-2.5 rounded-xl border border-dashed border-ink-900/20 px-4 py-3 cursor-pointer hover:border-gold-500/50 transition-colors">
+                    <Icon name="paperclip" size={16} className="text-ink-700/60 shrink-0" />
+                    <span className="text-sm text-ink-700/70 truncate">
+                      {photo ? photo.name : "Attach a reference photo (optional)"}
+                    </span>
+                    <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                    {photo && (
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          setPhoto(null);
+                        }}
+                        className="ml-auto text-ink-700/40 hover:text-red-500 transition-colors shrink-0"
+                        aria-label="Remove photo"
+                      >
+                        <Icon name="x" size={15} />
+                      </button>
+                    )}
+                  </label>
+
                   {error && (
                     <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
                       {error}
+                    </p>
+                  )}
+                  {!user && (
+                    <p className="text-sm text-ink-700 bg-beige-100 border border-ink-900/10 rounded-xl px-4 py-3">
+                      You'll be asked to log in before this is sent.
                     </p>
                   )}
                   <Button

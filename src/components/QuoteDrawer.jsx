@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { AnimatePresence, motion } from "framer-motion";
 import { useQuote } from "../context/QuoteContext";
 import { useAuth } from "../context/AuthContext";
@@ -61,30 +62,56 @@ function QuoteLineItem({ item }) {
   );
 }
 
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+
 export default function QuoteDrawer() {
   const { items, open, closeDrawer, clearQuote, totalQuantity } = useQuote();
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ name: user?.name || "", email: user?.email || "", phone: user?.phone || "", company: "" });
   const [notes, setNotes] = useState("");
+  const [photo, setPhoto] = useState(null);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
 
   const handleChange = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      setError("Please attach an image file.");
+      return;
+    }
+    if (file.size > MAX_PHOTO_BYTES) {
+      setError("Photo must be under 5MB.");
+      return;
+    }
+    setError("");
+    setPhoto(file);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!user) {
+      closeDrawer();
+      navigate("/login", { state: { from: { pathname: window.location.pathname } } });
+      return;
+    }
     setError("");
     setSubmitting(true);
     try {
       const lines = items.map((i) => `- ${i.name} — ${i.quantity} units (MOQ ${i.moq})`).join("\n");
       const message = `Bulk quote request for ${items.length} product(s):\n${lines}${notes ? `\n\nNotes: ${notes}` : ""}`;
-      await api.post("/enquiries", {
-        ...form,
-        type: "bulk",
-        estimatedQuantity: totalQuantity,
-        message,
-      });
+      const data = new FormData();
+      Object.entries(form).forEach(([key, value]) => data.append(key, value));
+      data.append("type", "bulk");
+      data.append("estimatedQuantity", totalQuantity);
+      data.append("message", message);
+      if (photo) data.append("photo", photo);
+
+      await api.post("/enquiries", data, { isForm: true });
       setSubmitted(true);
       clearQuote();
     } catch (err) {
@@ -191,8 +218,35 @@ export default function QuoteDrawer() {
                       placeholder="Branding, timeline, or other notes (optional)"
                       className={`${inputClasses} resize-none`}
                     />
+
+                    <label className="flex items-center gap-2.5 rounded-full border border-dashed border-cream-50/25 px-4 py-2.5 cursor-pointer hover:border-gold-500/50 transition-colors">
+                      <Icon name="paperclip" size={16} className="text-cream-100/60 shrink-0" />
+                      <span className="text-sm text-cream-100/70 truncate">
+                        {photo ? photo.name : "Attach a reference photo (optional)"}
+                      </span>
+                      <input type="file" accept="image/*" onChange={handlePhotoChange} className="hidden" />
+                      {photo && (
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setPhoto(null);
+                          }}
+                          className="ml-auto text-cream-100/40 hover:text-red-400 transition-colors shrink-0"
+                          aria-label="Remove photo"
+                        >
+                          <Icon name="x" size={15} />
+                        </button>
+                      )}
+                    </label>
+
                     {error && (
                       <p className="text-sm text-red-400 bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2">{error}</p>
+                    )}
+                    {!user && (
+                      <p className="text-sm text-cream-100/60 bg-cream-50/5 border border-cream-50/10 rounded-lg px-3 py-2">
+                        You'll be asked to log in before this is sent.
+                      </p>
                     )}
                     <Button type="submit" disabled={submitting} variant="primary" icon={submitting ? null : "arrow-right"} className="w-full">
                       {submitting ? "Sending..." : "Submit Quote Request"}

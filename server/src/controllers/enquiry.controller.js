@@ -3,6 +3,7 @@ import Enquiry from "../models/Enquiry.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { phoneSchema, nameSchema } from "../utils/validators.js";
 import { sendMail } from "../utils/mailer.js";
+import { uploadBuffer } from "../config/cloudinary.js";
 
 const enquirySchema = z.object({
   name: nameSchema,
@@ -16,7 +17,14 @@ const enquirySchema = z.object({
 
 export const createEnquiry = asyncHandler(async (req, res) => {
   const data = enquirySchema.parse(req.body);
-  const enquiry = await Enquiry.create(data);
+
+  let photoUrl;
+  if (req.file) {
+    const uploaded = await uploadBuffer(req.file.buffer, "jebags/enquiry-photos");
+    photoUrl = uploaded.url;
+  }
+
+  const enquiry = await Enquiry.create({ ...data, photoUrl });
 
   sendMail({
     to: process.env.ADMIN_EMAIL,
@@ -34,6 +42,11 @@ export const createEnquiry = asyncHandler(async (req, res) => {
         </table>
         <p style="margin-top:16px;color:#6b6151">Message:</p>
         <p style="white-space:pre-wrap">${data.message}</p>
+        ${photoUrl ? `
+        <p style="margin-top:16px;color:#6b6151">Reference photo:</p>
+        <a href="${photoUrl}" target="_blank" rel="noopener">
+          <img src="${photoUrl}" alt="Reference photo" style="max-width:100%;border-radius:8px;display:block" />
+        </a>` : ""}
       </div>
     `,
   }).catch((err) => console.error("Failed to send enquiry notification email:", err));

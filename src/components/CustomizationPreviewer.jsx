@@ -3,31 +3,37 @@ import Reveal from "./Reveal";
 import Icon from "./Icon";
 import Button from "./Button";
 
-const fabrics = [
-  { id: "ballistic-nylon", label: "1680D Ballistic Nylon", swatchClass: "bg-[#3a3d42]" },
-  { id: "vegan-leather", label: "Vegan Leather", swatchClass: "bg-[#4a3222]" },
-  { id: "ripstop-polyester", label: "Ripstop Polyester", swatchClass: "bg-ink-700" },
-  { id: "canvas", label: "Canvas", swatchClass: "bg-beige-300" },
-  { id: "other", label: "Other (specify)", swatchClass: "bg-white border-2 border-dashed border-ink-900/30", isCustom: true },
+export const materials = [
+  { id: "ballistic-nylon", label: "1680D Ballistic Nylon" },
+  { id: "vegan-leather", label: "Vegan Leather" },
+  { id: "ripstop-polyester", label: "Ripstop Polyester" },
+  { id: "canvas", label: "Canvas" },
+  { id: "other", label: "Other (specify)", isCustom: true },
 ];
 
-const finishes = [
-  { id: "metal-gold-plate", label: "Metal Gold Plate", icon: "sparkles" },
-  { id: "embossed", label: "Embossed", icon: "layers" },
-  { id: "woven-patch", label: "Woven Patch", icon: "pen-tool" },
-  { id: "screen-print", label: "Screen Print", icon: "printer" },
-  { id: "other", label: "Other (specify)", icon: "settings-2", isCustom: true },
+export const colors = [
+  { id: "charcoal-grey", label: "Charcoal Grey", swatchClass: "bg-[#3a3d42]" },
+  { id: "chestnut-brown", label: "Chestnut Brown", swatchClass: "bg-[#4a3222]" },
+  { id: "navy-blue", label: "Navy Blue", swatchClass: "bg-ink-700" },
+  { id: "sandstone-beige", label: "Sandstone Beige", swatchClass: "bg-beige-300" },
+  { id: "other", label: "Other (specify)", isCustom: true },
 ];
+
+const otherSwatchClass = "bg-white border-2 border-dashed border-ink-900/30";
 
 export default function CustomizationPreviewer({ onRequest }) {
-  const [fabric, setFabric] = useState(fabrics[0]);
-  const [finish, setFinish] = useState(finishes[0]);
-  const [customFabricText, setCustomFabricText] = useState("");
-  const [customFinishText, setCustomFinishText] = useState("");
+  const [material, setMaterial] = useState(materials[0]);
+  const [color, setColor] = useState(colors[0]);
+  const [customMaterialText, setCustomMaterialText] = useState("");
+  const [customColorText, setCustomColorText] = useState("");
 
-  const fabricLabel = fabric.isCustom ? customFabricText.trim() : fabric.label;
-  const finishLabel = finish.isCustom ? customFinishText.trim() : finish.label;
-  const canSubmit = fabricLabel.length > 0 && finishLabel.length > 0;
+  const materialLabel = material.isCustom ? customMaterialText.trim() : material.label;
+  const colorLabel = color.isCustom ? customColorText.trim() : color.label;
+  const canSubmit = materialLabel.length > 0 && colorLabel.length > 0;
+  const previewImage =
+    material.isCustom || color.isCustom
+      ? null
+      : `/images/custom-build/${material.id}--${color.id}.png`;
 
   return (
     <section className="bg-beige-100 py-14 sm:py-16">
@@ -45,87 +51,96 @@ export default function CustomizationPreviewer({ onRequest }) {
               <div className="mb-6">
                 <p className="text-xs font-semibold tracking-wide uppercase text-ink-700/60 mb-3">Material</p>
                 <div className="flex flex-wrap gap-3">
-                  {fabrics.map((f) => (
+                  {materials.map((m) => (
                     <button
-                      key={f.id}
+                      key={m.id}
                       type="button"
-                      onClick={() => setFabric(f)}
-                      className={`flex items-center gap-2.5 rounded-full border-2 pl-1.5 pr-4 py-1.5 transition-all duration-200 ${
-                        fabric.id === f.id
-                          ? "border-gold-500 ring-2 ring-ink-950/80"
-                          : "border-ink-900/10 hover:border-gold-500/40"
-                      }`}
-                    >
-                      <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${f.swatchClass}`}>
-                        {f.isCustom && <Icon name="pen-tool" size={12} className="text-ink-900/50" />}
-                      </span>
-                      <span className="text-sm font-medium text-ink-900">{f.label}</span>
-                    </button>
-                  ))}
-                </div>
-                {fabric.isCustom && (
-                  <input
-                    value={customFabricText}
-                    onChange={(e) => setCustomFabricText(e.target.value)}
-                    placeholder="Tell us the material you have in mind..."
-                    className="mt-3 w-full max-w-md rounded-full border border-ink-900/15 bg-white px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 transition-all"
-                  />
-                )}
-              </div>
-
-              <div>
-                <p className="text-xs font-semibold tracking-wide uppercase text-ink-700/60 mb-3">Logo Finish</p>
-                <div className="flex flex-wrap gap-3">
-                  {finishes.map((f) => (
-                    <button
-                      key={f.id}
-                      type="button"
-                      onClick={() => setFinish(f)}
+                      onClick={() => setMaterial(m)}
                       className={`flex items-center gap-2 rounded-full border-2 px-4 py-2 transition-all duration-200 ${
-                        finish.id === f.id
+                        material.id === m.id
                           ? "border-gold-500 ring-2 ring-ink-950/80 bg-beige-100"
                           : "border-ink-900/10 hover:border-gold-500/40"
                       }`}
                     >
-                      <Icon name={f.icon} size={15} className="text-gold-600" />
-                      <span className="text-sm font-medium text-ink-900">{f.label}</span>
+                      {m.isCustom && <Icon name="pen-tool" size={14} className="text-ink-900/50" />}
+                      <span className="text-sm font-medium text-ink-900">{m.label}</span>
                     </button>
                   ))}
                 </div>
-                {finish.isCustom && (
+                {material.isCustom && (
                   <input
-                    value={customFinishText}
-                    onChange={(e) => setCustomFinishText(e.target.value)}
-                    placeholder="Tell us the logo finish you have in mind..."
+                    value={customMaterialText}
+                    onChange={(e) => setCustomMaterialText(e.target.value)}
+                    placeholder="Material (e.g. waxed cotton canvas)"
                     className="mt-3 w-full max-w-md rounded-full border border-ink-900/15 bg-white px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 transition-all"
                   />
                 )}
               </div>
+
+              <div className="mb-6">
+                <p className="text-xs font-semibold tracking-wide uppercase text-ink-700/60 mb-3">Color</p>
+                <div className="flex flex-wrap gap-3">
+                  {colors.map((c) => (
+                    <button
+                      key={c.id}
+                      type="button"
+                      onClick={() => setColor(c)}
+                      className={`flex items-center gap-2.5 rounded-full border-2 pl-1.5 pr-4 py-1.5 transition-all duration-200 ${
+                        color.id === c.id
+                          ? "border-gold-500 ring-2 ring-ink-950/80"
+                          : "border-ink-900/10 hover:border-gold-500/40"
+                      }`}
+                    >
+                      <span className={`w-7 h-7 rounded-full flex items-center justify-center shrink-0 ${c.isCustom ? otherSwatchClass : c.swatchClass}`}>
+                        {c.isCustom && <Icon name="pen-tool" size={12} className="text-ink-900/50" />}
+                      </span>
+                      <span className="text-sm font-medium text-ink-900">{c.label}</span>
+                    </button>
+                  ))}
+                </div>
+                {color.isCustom && (
+                  <input
+                    value={customColorText}
+                    onChange={(e) => setCustomColorText(e.target.value)}
+                    placeholder="Color (e.g. forest green)"
+                    className="mt-3 w-full max-w-md rounded-full border border-ink-900/15 bg-white px-4 py-2.5 text-sm text-ink-900 placeholder:text-ink-700/40 focus:outline-none focus:ring-2 focus:ring-gold-500/50 focus:border-gold-500 transition-all"
+                  />
+                )}
+              </div>
+
+              <p className="text-xs text-ink-700/50">
+                {material.isCustom || color.isCustom
+                  ? "We'll mock up your custom material/color and send it over with your quote."
+                  : "Preview on the right updates automatically."}
+              </p>
             </div>
 
-            <div className="lg:w-72 rounded-2xl bg-ink-950 p-6 shrink-0">
+            <div className="lg:w-80 rounded-2xl bg-ink-950 p-6 shrink-0">
               <p className="text-[11px] tracking-[0.2em] uppercase text-gold-400 font-semibold mb-3">
                 Your Selection
               </p>
-              <div className="flex items-center gap-3 mb-2">
-                <span className={`w-8 h-8 rounded-full shrink-0 border border-cream-50/20 flex items-center justify-center ${fabric.isCustom ? "bg-cream-50/10" : fabric.swatchClass}`}>
-                  {fabric.isCustom && <Icon name="pen-tool" size={13} className="text-gold-400" />}
-                </span>
-                <p className="text-sm text-cream-50 font-medium">
-                  {fabricLabel || "Your material"}
-                </p>
+
+              <div className="relative mb-4 aspect-square rounded-xl bg-cream-50/5 border border-cream-50/10 overflow-hidden flex items-center justify-center">
+                {previewImage ? (
+                  <img src={previewImage} alt={`${materialLabel} / ${colorLabel} preview`} className="absolute inset-0 w-full h-full object-contain p-2" />
+                ) : (
+                  <p className="text-xs text-cream-100/40 text-center px-4">
+                    We'll send a mockup in your custom material/color with the quote.
+                  </p>
+                )}
               </div>
+
               <div className="flex items-center gap-3 mb-5">
-                <span className="w-8 h-8 rounded-full bg-cream-50/10 flex items-center justify-center shrink-0">
-                  <Icon name={finish.icon} size={14} className="text-gold-400" />
+                <span className={`w-8 h-8 rounded-full shrink-0 border border-cream-50/20 flex items-center justify-center ${color.isCustom ? "bg-cream-50/10" : color.swatchClass}`}>
+                  {(material.isCustom || color.isCustom) && <Icon name="pen-tool" size={13} className="text-gold-400" />}
                 </span>
                 <p className="text-sm text-cream-50 font-medium">
-                  {finishLabel || "Your finish"}
+                  {materialLabel && colorLabel ? `${materialLabel} — ${colorLabel}` : "Your material & color"}
                 </p>
               </div>
               <Button
                 type="button"
-                onClick={() => onRequest?.(fabricLabel, finishLabel)}
+                onClick={() => onRequest?.(`${materialLabel} (${colorLabel})`)}
                 disabled={!canSubmit}
                 variant="primary"
                 size="sm"

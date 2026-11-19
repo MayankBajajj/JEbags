@@ -183,7 +183,7 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="fixed top-2 inset-x-0 z-50 will-change-transform">
+      <div className="fixed top-[11px] inset-x-0 z-50 will-change-transform">
         <div className="hidden sm:block bg-ink-950 text-cream-100 text-xs tracking-[0.1em] text-center py-2 px-4 whitespace-nowrap overflow-hidden text-ellipsis">
           Pan-India Delivery &amp; Export &middot; Bulk, OEM &amp; Corporate Gifting Orders Welcome
         </div>

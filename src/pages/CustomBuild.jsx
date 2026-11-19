@@ -1,17 +1,25 @@
+import { useNavigate } from "react-router-dom";
 import PageHero from "../components/PageHero";
 import CustomizationPreviewer from "../components/CustomizationPreviewer";
 import Button from "../components/Button";
 import { useQuote } from "../context/QuoteContext";
+import { useAuth } from "../context/AuthContext";
 
 export default function CustomBuild() {
   const { addItem: addQuoteItem, openDrawer } = useQuote();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
-  const handleCustomBuildRequest = (fabricLabel, finishLabel) => {
+  const handleCustomBuildRequest = (fabricLabel) => {
+    if (!user) {
+      navigate("/login", { state: { from: { pathname: "/custom-build" } } });
+      return;
+    }
     addQuoteItem({
-      _id: `custom-${fabricLabel}-${finishLabel}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
-      name: `Custom Build — ${fabricLabel} / ${finishLabel}`,
+      _id: `custom-${fabricLabel}`.toLowerCase().replace(/[^a-z0-9]+/g, "-"),
+      name: `Custom Build — ${fabricLabel}`,
       images: [],
-      moq: 100,
+      moq: 300,
     });
     openDrawer();
   };
@@ -22,7 +30,7 @@ export default function CustomBuild() {
         eyebrow="Bulk & Custom Orders"
         title="Build It"
         highlight="Your Way"
-        description="Pick a material and logo finish — or tell us exactly what you have in mind — and we'll turn it into a bulk order quote."
+        description="Pick a material and color — or tell us exactly what you have in mind — and we'll turn it into a bulk order quote."
       />
 
       <CustomizationPreviewer onRequest={handleCustomBuildRequest} />

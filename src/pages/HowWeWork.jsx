@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import PageHero from "../components/PageHero";
 import Reveal from "../components/Reveal";
@@ -36,22 +36,49 @@ const videoMap = {
 
 function StepCard({ step, index, active }) {
   const [open, setOpen] = useState(false);
+  const videoRef = useRef(null);
+  const cardRef = useRef(null);
+
+  // Only decode/play the clips actually near the viewport — with 10 looping
+  // videos on this page, letting all of them decode at once is what was
+  // causing browsers to occasionally bleed a frame from one clip into
+  // another (a real decoder-contention issue, not a content bug).
+  useEffect(() => {
+    const videoEl = videoRef.current;
+    const cardEl = cardRef.current;
+    if (!videoEl || !cardEl) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          videoEl.play().catch(() => {});
+        } else {
+          videoEl.pause();
+        }
+      },
+      { rootMargin: "200px 0px 200px 0px", threshold: 0 }
+    );
+    observer.observe(cardEl);
+    return () => observer.disconnect();
+  }, []);
 
   return (
     <div
       id={step.id}
+      ref={cardRef}
       className={`scroll-mt-32 group rounded-2xl overflow-hidden bg-white border transition-all duration-300 ${
         active ? "border-gold-500/60 shadow-xl shadow-ink-900/10 -translate-y-1" : "border-ink-900/8 shadow-sm"
       }`}
     >
       <div className="relative aspect-[16/10] overflow-hidden bg-ink-950">
         <video
+          ref={videoRef}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
           src={videoMap[step.id]}
-          autoPlay
           muted
           loop
           playsInline
+          preload="none"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950/85 via-ink-950/10 to-transparent" />
 

@@ -1,13 +1,14 @@
 import { useEffect, useRef, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import Icon from "./Icon";
 
 const bagImage = "/images/hero-bag-3d.png";
 
 const GRID = 6;
 const START = 2; // sync with the global LoadingScreen's ~1.95s exit
-const TILE_START = START + 0.3;
-const TILE_END = START + 2.2;
+const TILE_START = START + 0.2;
+const TILE_END = START + 1.1;
 const MAX_WAVE = (GRID - 1) * 2; // (5-row)+(col) max value
 const STEP = (TILE_END - TILE_START) / MAX_WAVE;
 const ASSEMBLE_DONE = TILE_END + 0.35;
@@ -45,9 +46,9 @@ function Tile({ row, col }) {
         clipPath: `inset(${top}% ${right}% ${bottom}% ${left}%)`,
         transformOrigin: `${col * CELL + CELL / 2}% ${row * CELL + CELL / 2}%`,
       }}
-      initial={{ opacity: 0, z: -140, rotateX: 35, rotateY: -25, scale: 0.82, borderColor: "rgba(212,175,55,0.65)" }}
+      initial={{ opacity: 0, z: -40, rotateX: 8, rotateY: -8, scale: 0.94, borderColor: "rgba(212,175,55,0.65)" }}
       animate={{ opacity: 1, z: 0, rotateX: 0, rotateY: 0, scale: 1, borderColor: "rgba(212,175,55,0)" }}
-      transition={{ duration: 0.7, delay, ease: SPRING_EASE }}
+      transition={{ duration: 0.45, delay, ease: SPRING_EASE }}
     />
   );
 }
@@ -124,9 +125,16 @@ export default function BagGridReveal() {
     <div
       key={replayKey}
       ref={containerRef}
-      className="relative max-w-[700px] mx-auto aspect-square"
+      className="relative group/bag max-w-[min(520px,48vh)] mx-auto aspect-square"
       style={{ perspective: 1000 }}
     >
+      <Link
+        to="/how-we-work"
+        className="absolute left-1/2 -translate-x-1/2 -top-4 sm:-top-6 z-30 inline-flex items-center gap-2 bg-ink-950 text-cream-50 text-xs font-bold uppercase tracking-wide px-5 py-2.5 rounded-full shadow-lg shadow-ink-900/25 opacity-0 translate-y-2 pointer-events-none transition-all duration-300 group-hover/bag:opacity-100 group-hover/bag:translate-y-0 group-hover/bag:pointer-events-auto hover:bg-gold-500 hover:text-ink-950"
+      >
+        See How We Work
+        <Icon name="arrow-right" size={14} />
+      </Link>
       {/* ambient studio glow behind the bag for depth */}
       <motion.div
         className="absolute -inset-10 rounded-full pointer-events-none"

@@ -62,7 +62,7 @@ export default function ScrollProgressBar() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-[9999] h-2 bg-ink-950 overflow-hidden pointer-events-none transform-gpu">
+    <div className="fixed top-[3px] left-0 right-0 z-[9999] h-2 bg-ink-950 overflow-hidden pointer-events-none transform-gpu">
       {/* faint track */}
       <svg
         viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}

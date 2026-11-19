@@ -1,13 +1,20 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useQuote } from "../context/QuoteContext";
+import { useAuth } from "../context/AuthContext";
 import Icon from "./Icon";
 
 export default function ProductCard({ product }) {
   const { addItem, openDrawer } = useQuote();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const handleRequestSample = (e) => {
     e.preventDefault();
     e.stopPropagation();
+    if (!user) {
+      navigate("/login", { state: { from: { pathname: `/products/${product.slug}` } } });
+      return;
+    }
     addItem(product);
     openDrawer();
   };

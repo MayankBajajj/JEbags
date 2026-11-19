@@ -5,7 +5,7 @@ import heroVideo from "../assets/videos/hero-video.mp4";
 
 export default function Hero() {
   return (
-    <section className="relative bg-cream-50 pt-28 pb-12 sm:pt-44 sm:pb-16 lg:pt-32 lg:pb-10 flex-1 sm:flex-none flex flex-col justify-center overflow-hidden">
+    <section className="relative bg-cream-50 pt-28 pb-12 sm:pt-44 sm:pb-16 lg:pt-32 lg:pb-10 flex-1 sm:flex-none sm:min-h-[max(560px,78vh)] lg:min-h-[max(620px,82vh)] flex flex-col justify-center overflow-hidden">
       <video
         className="absolute inset-0 w-full h-full object-cover scale-110 sm:scale-100 opacity-[0.45] will-change-transform"
         src={heroVideo}
@@ -17,9 +17,8 @@ export default function Hero() {
       <div className="absolute inset-0 bg-cream-50/55" />
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_rgba(200,154,63,0.14),_transparent_55%)]" />
 
-      <div className="max-w-7xl mx-auto px-5 sm:px-8 relative grid lg:grid-cols-[50%_50%] gap-12 lg:gap-8 items-center">
+      <div className="px-5 sm:px-8 lg:px-10 relative grid lg:grid-cols-[50%_50%] gap-12 lg:gap-16 items-center">
         <motion.div
-          className="lg:-translate-x-6 xl:-translate-x-8"
           initial={{ opacity: 0, y: 24 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
@@ -52,7 +51,7 @@ export default function Hero() {
         </motion.div>
 
         <motion.div
-          className="lg:translate-x-6 xl:translate-x-10 lg:-translate-y-6"
+          className="lg:translate-x-14 xl:translate-x-24 lg:-translate-y-6"
           initial={{ opacity: 0, scale: 0.92 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.6, ease: [0.22, 1, 0.36, 1] }}

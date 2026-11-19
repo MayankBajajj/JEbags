@@ -65,6 +65,11 @@ export default function AdminEnquiries() {
                 </select>
               </div>
               <p className="text-sm text-ink-700 leading-relaxed">{e.message}</p>
+              {e.photoUrl && (
+                <a href={e.photoUrl} target="_blank" rel="noopener noreferrer" className="mt-3 inline-block">
+                  <img src={e.photoUrl} alt="Reference" className="h-24 w-24 object-cover rounded-lg border border-ink-900/10 hover:opacity-90 transition-opacity" />
+                </a>
+              )}
               <div className="mt-3 flex items-center gap-3 text-xs text-ink-700/60">
                 <span className="capitalize">{e.type}</span>
                 {e.estimatedQuantity && <span>· ~{e.estimatedQuantity} units</span>}

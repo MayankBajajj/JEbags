@@ -39,6 +39,7 @@ import {
   Printer,
   ClipboardCheck,
   ChevronDown,
+  Paperclip,
 } from "lucide-react";
 
 const map = {
@@ -82,6 +83,7 @@ const map = {
   printer: Printer,
   "clipboard-check": ClipboardCheck,
   "chevron-down": ChevronDown,
+  paperclip: Paperclip,
 };
 
 export default function Icon({ name, className = "", size = 22, strokeWidth = 1.75 }) {
