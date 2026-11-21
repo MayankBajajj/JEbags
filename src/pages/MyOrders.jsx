@@ -28,7 +28,7 @@ function PaymentBadge({ order }) {
   );
 }
 
-function OrderCard({ order, onRecheck, rechecking }) {
+function OrderCard({ order, onRecheck, rechecking, onRefreshShipping, refreshingShipping }) {
   const [expanded, setExpanded] = useState(false);
   const shortId = order._id.slice(-8).toUpperCase();
   const stepIndex = STATUS_STEPS.indexOf(order.status);
@@ -110,6 +110,38 @@ function OrderCard({ order, onRecheck, rechecking }) {
         </div>
       )}
 
+      {order.paymentStatus === "paid" && (
+        <div className="px-6 pb-5">
+          {order.shiprocket?.shipmentId ? (
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-700">
+              <span className="font-semibold text-ink-900">Shipping status: {order.shiprocket.status || "NEW"}</span>
+              {order.shiprocket.awbCode && <span>AWB {order.shiprocket.awbCode}</span>}
+              {order.shiprocket.courierName && <span>via {order.shiprocket.courierName}</span>}
+              {order.shiprocket.trackingUrl && (
+                <a href={order.shiprocket.trackingUrl} target="_blank" rel="noreferrer" className="font-semibold text-gold-600 hover:text-gold-700">
+                  Track Shipment
+                </a>
+              )}
+              <button
+                onClick={() => onRefreshShipping(order._id)}
+                disabled={refreshingShipping === order._id}
+                className="font-semibold text-gold-600 hover:text-gold-700 disabled:opacity-50"
+              >
+                {refreshingShipping === order._id ? "Checking..." : "Refresh"}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => onRefreshShipping(order._id)}
+              disabled={refreshingShipping === order._id}
+              className="text-xs font-semibold text-gold-600 hover:text-gold-700 disabled:opacity-50"
+            >
+              {refreshingShipping === order._id ? "Checking..." : "Check Shipping Status"}
+            </button>
+          )}
+        </div>
+      )}
+
       <button
         onClick={() => setExpanded((v) => !v)}
         className="w-full flex items-center justify-between px-6 py-3 border-t border-ink-900/10 text-xs font-semibold text-ink-700 hover:bg-cream-50 transition-colors"
@@ -154,6 +186,7 @@ export default function MyOrders() {
   const [orders, setOrders] = useState(null);
   const [error, setError] = useState("");
   const [rechecking, setRechecking] = useState(null);
+  const [refreshingShipping, setRefreshingShipping] = useState(null);
 
   useEffect(() => {
     api
@@ -172,6 +205,19 @@ export default function MyOrders() {
       setError(err instanceof ApiError ? err.message : "Couldn't check payment status, try again.");
     } finally {
       setRechecking(null);
+    }
+  };
+
+  const handleRefreshShipping = async (id) => {
+    setRefreshingShipping(id);
+    setError("");
+    try {
+      const { order } = await api.get(`/orders/${id}/shipping`);
+      setOrders((os) => os.map((o) => (o._id === id ? order : o)));
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Couldn't check shipping status, try again.");
+    } finally {
+      setRefreshingShipping(null);
     }
   };
 
@@ -203,7 +249,14 @@ export default function MyOrders() {
           ) : (
             <div className="space-y-5">
               {orders.map((order) => (
-                <OrderCard key={order._id} order={order} onRecheck={handleRecheck} rechecking={rechecking} />
+                <OrderCard
+                  key={order._id}
+                  order={order}
+                  onRecheck={handleRecheck}
+                  rechecking={rechecking}
+                  onRefreshShipping={handleRefreshShipping}
+                  refreshingShipping={refreshingShipping}
+                />
               ))}
             </div>
           )}

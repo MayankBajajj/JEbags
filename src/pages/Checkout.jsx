@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
+import { useAuth } from "../context/AuthContext";
 import { api, ApiError } from "../lib/api";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
@@ -37,13 +38,14 @@ function CheckoutBanner({ eyebrow, title }) {
 
 export default function Checkout() {
   const { items, totalAmount, clearCart } = useCart();
+  const { user } = useAuth();
   const [address, setAddress] = useState({
     line1: "",
     line2: "",
     city: "",
     state: "",
     pincode: "",
-    phone: "",
+    phone: user?.phone || "",
   });
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
@@ -54,6 +56,13 @@ export default function Checkout() {
   const [order, setOrder] = useState(null);
   const [razorpayConfig, setRazorpayConfig] = useState(null);
   const [checking, setChecking] = useState(false);
+
+  // The phone field is locked to the logged-in account's own number (orders
+  // must be placed with the same phone the customer logs in with), and
+  // useAuth's user loads asynchronously, so sync it in once available.
+  useEffect(() => {
+    if (user?.phone) setAddress((a) => ({ ...a, phone: user.phone }));
+  }, [user?.phone]);
 
   // Safety net for the rare case the webhook hasn't landed yet when our own
   // /verify call runs (normally it's the other way round and verify's own
@@ -297,7 +306,7 @@ export default function Checkout() {
 
             <div>
               <label className="block text-xs font-semibold text-ink-900 mb-2">Contact Phone</label>
-              <PhoneInput value={address.phone} onChange={handleChange} />
+              <PhoneInput value={address.phone} onChange={handleChange} disabled />
             </div>
             <div>
               <label className="block text-xs font-semibold text-ink-900 mb-2">Address Line 1</label>
@@ -340,13 +349,18 @@ export default function Checkout() {
         <div className="lg:sticky lg:top-28">
           <h2 className="font-display font-semibold text-2xl text-ink-950 mb-6">Order Summary</h2>
           <div className="bg-white rounded-2xl border border-ink-900/10 p-6">
-            <div className="space-y-3 mb-4">
+            <div className="space-y-4 mb-4">
               {items.map((item) => (
-                <div key={item.productId} className="flex justify-between text-sm">
-                  <span className="text-ink-700">
+                <div key={item.productId} className="flex items-center gap-3 text-sm">
+                  <div className="w-14 h-14 rounded-lg overflow-hidden bg-cream-50 border border-ink-900/10 shrink-0">
+                    {item.image && (
+                      <img src={item.image} alt={item.name} className="w-full h-full object-cover" />
+                    )}
+                  </div>
+                  <span className="text-ink-700 flex-1">
                     {item.name} × {item.quantity}
                   </span>
-                  <span className="text-ink-950">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
+                  <span className="text-ink-950 font-medium">₹{(item.price * item.quantity).toLocaleString("en-IN")}</span>
                 </div>
               ))}
             </div>

@@ -1,10 +1,12 @@
 import { z } from "zod";
 import Order from "../models/Order.js";
 import Product from "../models/Product.js";
+import User from "../models/User.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { phoneSchema, pincodeSchema } from "../utils/validators.js";
 import { createRazorpayOrder, fetchRazorpayPayment, verifyPaymentSignature } from "../config/razorpay.js";
 import { markOrderPaid, reconcileOrder, initiateRefund } from "../services/payment.service.js";
+import { syncOrderToShiprocket, refreshShipmentStatus } from "../services/shiprocket.service.js";
 
 const PAYMENT_EXPIRY_MINUTES = 20;
 
@@ -27,6 +29,14 @@ const checkoutSchema = z.object({
 
 export const createOrder = asyncHandler(async (req, res) => {
   const data = checkoutSchema.parse(req.body);
+
+  // Shipments must go out under the same phone number the customer logs in
+  // with — the client already locks this field, but that's UI only, so it's
+  // enforced here too.
+  const requester = await User.findById(req.user.id).select("phone");
+  if (requester?.phone && data.shippingAddress.phone !== requester.phone) {
+    return res.status(400).json({ message: "Orders must be placed with the phone number on your account." });
+  }
 
   const products = await Product.find({
     _id: { $in: data.items.map((i) => i.productId) },
@@ -163,6 +173,32 @@ export const reconcilePayment = asyncHandler(async (req, res) => {
 
   const result = await reconcileOrder(order._id);
   res.json({ order: result.order || order, updated: result.updated });
+});
+
+// Manual "Check Shipping Status" — pulls the latest AWB/courier/status from
+// Shiprocket for an order already pushed there. If it was never pushed
+// (e.g. Shiprocket was down when the payment first confirmed), this retries
+// that instead.
+export const refreshShipping = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  if (order.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Not your order" });
+  }
+
+  if (!order.shiprocket?.shipmentId) {
+    if (order.paymentStatus !== "paid") {
+      return res.status(400).json({ message: "This order hasn't been paid for yet" });
+    }
+    const synced = await syncOrderToShiprocket(order._id);
+    if (!synced.synced) {
+      return res.status(502).json({ message: synced.error || "Couldn't reach Shiprocket yet, try again shortly" });
+    }
+    return res.json({ order: await Order.findById(order._id) });
+  }
+
+  const result = await refreshShipmentStatus(order._id);
+  res.json({ order: result.order || order });
 });
 
 export const myOrders = asyncHandler(async (req, res) => {

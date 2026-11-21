@@ -2,6 +2,7 @@ import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import { fetchRazorpayOrderPayments, createRazorpayRefund } from "../config/razorpay.js";
 import { sendMail } from "../utils/mailer.js";
+import { syncOrderToShiprocket } from "./shiprocket.service.js";
 
 // All three entry points into "a payment happened" — the client-side verify
 // call, the Razorpay webhook, and the manual/swept reconcile check — funnel
@@ -52,6 +53,7 @@ export async function markOrderPaid(orderId, { paymentId, signature, amountPaise
   }
 
   sendOrderConfirmation(order).catch((err) => console.error("Order confirmation email failed:", err.message));
+  syncOrderToShiprocket(order._id).catch((err) => console.error("Shiprocket sync failed:", err.message));
   return { updated: true, order };
 }
 

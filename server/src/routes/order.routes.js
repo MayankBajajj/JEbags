@@ -3,6 +3,7 @@ import {
   createOrder,
   verifyPayment,
   reconcilePayment,
+  refreshShipping,
   myOrders,
   getOrder,
   adminListOrders,
@@ -24,6 +25,7 @@ router.post("/admin/:id/refund", authenticate, requireAdmin, refundOrder);
 
 router.post("/:id/verify", authenticate, verifyPayment);
 router.get("/:id/reconcile", authenticate, reconcilePayment);
+router.get("/:id/shipping", authenticate, refreshShipping);
 router.get("/:id", authenticate, getOrder);
 
 export default router;

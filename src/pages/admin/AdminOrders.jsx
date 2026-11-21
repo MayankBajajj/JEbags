@@ -8,6 +8,7 @@ export default function AdminOrders() {
   const [error, setError] = useState("");
   const [rechecking, setRechecking] = useState(null);
   const [refunding, setRefunding] = useState(null);
+  const [refreshingShipping, setRefreshingShipping] = useState(null);
 
   const load = () => {
     api
@@ -56,6 +57,19 @@ export default function AdminOrders() {
     }
   };
 
+  const handleRefreshShipping = async (id) => {
+    setRefreshingShipping(id);
+    setError("");
+    try {
+      const { order } = await api.get(`/orders/${id}/shipping`);
+      setOrders((os) => os.map((o) => (o._id === id ? order : o)));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefreshingShipping(null);
+    }
+  };
+
   return (
     <div className="p-8 sm:p-10">
       <h1 className="font-display font-semibold text-2xl text-ink-950 mb-1">Orders</h1>
@@ -78,6 +92,7 @@ export default function AdminOrders() {
                 <th className="py-3 px-5">Items</th>
                 <th className="py-3 px-5">Total</th>
                 <th className="py-3 px-5">Payment</th>
+                <th className="py-3 px-5">Shipping</th>
                 <th className="py-3 px-5">Placed</th>
                 <th className="py-3 px-5">Status</th>
               </tr>
@@ -134,6 +149,31 @@ export default function AdminOrders() {
                       >
                         {refunding === o._id ? "Refunding..." : "Refund"}
                       </button>
+                    )}
+                  </td>
+                  <td className="py-3 px-5 text-ink-700">
+                    {o.paymentStatus === "paid" ? (
+                      <>
+                        {o.shiprocket?.shipmentId ? (
+                          <>
+                            <span className="font-medium text-ink-900">{o.shiprocket.status || "NEW"}</span>
+                            {o.shiprocket.awbCode && <p className="text-xs text-ink-700/70">AWB {o.shiprocket.awbCode}</p>}
+                          </>
+                        ) : o.shiprocket?.error ? (
+                          <p className="text-xs text-red-600 max-w-[160px]">{o.shiprocket.error}</p>
+                        ) : (
+                          <span className="text-xs text-ink-700/50">Not pushed yet</span>
+                        )}
+                        <button
+                          onClick={() => handleRefreshShipping(o._id)}
+                          disabled={refreshingShipping === o._id}
+                          className="block mt-1 text-xs font-semibold text-gold-600 hover:text-gold-700 disabled:opacity-50"
+                        >
+                          {refreshingShipping === o._id ? "Checking..." : o.shiprocket?.shipmentId ? "Refresh" : "Push to Shiprocket"}
+                        </button>
+                      </>
+                    ) : (
+                      <span className="text-xs text-ink-700/40">—</span>
                     )}
                   </td>
                   <td className="py-3 px-5 text-ink-700">{new Date(o.createdAt).toLocaleDateString("en-IN")}</td>

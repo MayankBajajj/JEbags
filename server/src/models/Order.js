@@ -46,6 +46,20 @@ const orderSchema = new mongoose.Schema(
       amount: Number, // rupees
       status: { type: String, enum: ["none", "created", "processed", "failed"], default: "none" },
     },
+    // Populated once the order is pushed to Shiprocket right after payment
+    // is confirmed — see services/shiprocket.service.js. `status` is the raw
+    // string Shiprocket reports (e.g. "NEW", "PICKED UP", "IN TRANSIT",
+    // "DELIVERED") shown as-is, not remapped to our own vocabulary.
+    shiprocket: {
+      orderId: String,
+      shipmentId: String,
+      awbCode: String,
+      courierName: String,
+      status: String,
+      trackingUrl: String,
+      error: String,
+      lastSyncedAt: Date,
+    },
     // Reserved stock is released and the order is marked failed if payment
     // hasn't completed by this time — see utils/paymentExpiry.js.
     paymentExpiresAt: Date,

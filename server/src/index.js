@@ -10,6 +10,7 @@ import morgan from "morgan";
 import { connectDB } from "./config/db.js";
 import { seedAdmin } from "./utils/seedAdmin.js";
 import { startPaymentExpirySweep } from "./utils/paymentExpiry.js";
+import { startShipmentStatusSweep } from "./utils/shipmentSync.js";
 import { notFound, errorHandler } from "./middleware/errorHandler.js";
 
 import authRoutes from "./routes/auth.routes.js";
@@ -72,6 +73,7 @@ connectDB()
   .then(seedAdmin)
   .then(() => {
     startPaymentExpirySweep();
+    startShipmentStatusSweep();
     app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
   })
   .catch((err) => {
