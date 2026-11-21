@@ -228,6 +228,9 @@ export default function Navbar() {
             {user ? (
               <div className="flex items-center gap-4">
                 <span className="text-sm font-medium text-ink-800">Hi, {user.name?.split(" ")[0]}</span>
+                <NavLink to="/orders" className="text-sm font-medium text-ink-700 hover:text-gold-600 transition-colors">
+                  My Orders
+                </NavLink>
                 <button onClick={handleLogout} className="text-sm font-medium text-ink-700 hover:text-gold-600 transition-colors">
                   Log out
                 </button>
@@ -282,9 +285,14 @@ export default function Navbar() {
           {user ? (
             <div className="py-4 border-b border-ink-900/10 flex items-center justify-between">
               <span className="text-lg font-medium text-ink-900/85">Hi, {user.name?.split(" ")[0]}</span>
-              <button onClick={handleLogout} className="text-sm font-semibold text-gold-600">
-                Log out
-              </button>
+              <div className="flex items-center gap-4">
+                <NavLink to="/orders" onClick={() => setOpen(false)} className="text-sm font-semibold text-ink-700">
+                  My Orders
+                </NavLink>
+                <button onClick={handleLogout} className="text-sm font-semibold text-gold-600">
+                  Log out
+                </button>
+              </div>
             </div>
           ) : (
             <NavLink
