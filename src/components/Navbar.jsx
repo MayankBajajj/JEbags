@@ -98,6 +98,48 @@ function DesktopNavItem({ link }) {
   );
 }
 
+function UserMenu({ user, onLogout }) {
+  const [open, setOpen] = useState(false);
+
+  return (
+    <div className="relative" onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+      <button className="group relative flex items-center gap-1 py-1 text-sm font-medium text-ink-800/80 hover:text-gold-600 transition-colors">
+        Hi, {user.name?.split(" ")[0]}
+        <Icon name="chevron-down" size={14} className={`transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: 8, scale: 0.96 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 8, scale: 0.96 }}
+            transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+            style={{ transformOrigin: "top right" }}
+            className="absolute right-0 top-full pt-3 w-44 z-50"
+          >
+            <div className="rounded-2xl border border-ink-900/10 bg-white shadow-xl shadow-ink-900/15 py-2">
+              <Link
+                to="/orders"
+                onClick={() => setOpen(false)}
+                className="block px-5 py-2.5 text-sm font-medium text-ink-800 hover:bg-gold-500 hover:text-ink-950 transition-colors"
+              >
+                My Orders
+              </Link>
+              <button
+                onClick={onLogout}
+                className="block w-full text-left px-5 py-2.5 text-sm font-medium text-ink-800 hover:bg-gold-500 hover:text-ink-950 transition-colors"
+              >
+                Log out
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
 function MobileNavItem({ link, onNavigate }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -226,15 +268,7 @@ export default function Navbar() {
             </NavLink>
 
             {user ? (
-              <div className="flex items-center gap-4">
-                <span className="text-sm font-medium text-ink-800">Hi, {user.name?.split(" ")[0]}</span>
-                <NavLink to="/orders" className="text-sm font-medium text-ink-700 hover:text-gold-600 transition-colors">
-                  My Orders
-                </NavLink>
-                <button onClick={handleLogout} className="text-sm font-medium text-ink-700 hover:text-gold-600 transition-colors">
-                  Log out
-                </button>
-              </div>
+              <UserMenu user={user} onLogout={handleLogout} />
             ) : (
               <NavLink to="/login" className="text-sm font-medium text-ink-800/80 hover:text-gold-600 transition-colors">
                 Log In
