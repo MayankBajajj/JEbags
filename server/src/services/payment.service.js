@@ -38,10 +38,17 @@ export async function markOrderPaid(orderId, { paymentId, signature, amountPaise
   ).populate("user", "name email");
 
   if (!order) {
-    // Already paid (or order not found) — this is the normal, expected
-    // outcome when a duplicate webhook retry or a second confirmation path
-    // arrives after the first one already won the race.
-    return { updated: false, reason: "already_paid_or_missing" };
+    // The filter excluded this doc, meaning either another path (usually
+    // the webhook) already won the race and paid it first, or the order
+    // doesn't exist. Either way, callers need the CURRENT state here, not
+    // the pre-update snapshot they already have — otherwise a caller like
+    // verifyPayment would report "not paid" for an order that is, in fact,
+    // already paid.
+    const existing = await Order.findById(orderId).populate("user", "name email");
+    if (existing?.paymentStatus === "paid") {
+      return { updated: false, reason: "already_paid", order: existing };
+    }
+    return { updated: false, reason: "missing" };
   }
 
   sendOrderConfirmation(order).catch((err) => console.error("Order confirmation email failed:", err.message));

@@ -143,7 +143,12 @@ export const verifyPayment = asyncHandler(async (req, res) => {
     event: "payment.captured",
   });
 
-  res.json({ order: result.order || order, paid: Boolean(result.order) });
+  // result.order reflects the CURRENT state even when this call lost a race
+  // to the webhook (see markOrderPaid) — never fall back to the stale `order`
+  // fetched before the update, or an already-paid order would be reported
+  // as unpaid to the browser.
+  const finalOrder = result.order || order;
+  res.json({ order: finalOrder, paid: finalOrder.paymentStatus === "paid" });
 });
 
 // Manual "Check Payment Status" — and also what the expiry sweep calls

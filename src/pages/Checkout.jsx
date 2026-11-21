@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
 import { api, ApiError } from "../lib/api";
@@ -54,6 +54,48 @@ export default function Checkout() {
   const [order, setOrder] = useState(null);
   const [razorpayConfig, setRazorpayConfig] = useState(null);
   const [checking, setChecking] = useState(false);
+
+  // Safety net for the rare case the webhook hasn't landed yet when our own
+  // /verify call runs (normally it's the other way round and verify's own
+  // response already says paid) — poll a few times instead of leaving the
+  // customer stuck on a static spinner forever.
+  useEffect(() => {
+    if (step !== "confirming" || !order?._id) return undefined;
+
+    let cancelled = false;
+    let attempts = 0;
+    const maxAttempts = 8;
+    let timeoutId;
+
+    const poll = async () => {
+      attempts += 1;
+      try {
+        const { order: checked } = await api.get(`/orders/${order._id}/reconcile`);
+        if (cancelled) return;
+        if (checked.paymentStatus === "paid") {
+          setOrder(checked);
+          setStep("confirmed");
+          return;
+        }
+        if (checked.paymentStatus === "failed") {
+          setOrder(checked);
+          setStep("payment-failed");
+          return;
+        }
+      } catch {
+        // Transient network/API hiccup — just try again on the next tick.
+      }
+      if (!cancelled && attempts < maxAttempts) {
+        timeoutId = setTimeout(poll, 3000);
+      }
+    };
+
+    timeoutId = setTimeout(poll, 2000);
+    return () => {
+      cancelled = true;
+      clearTimeout(timeoutId);
+    };
+  }, [step, order?._id]);
 
   if (items.length === 0 && step === "form") {
     return <Navigate to="/cart" replace />;
