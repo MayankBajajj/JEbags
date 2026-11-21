@@ -213,10 +213,11 @@ export default function QuoteDrawer() {
                       className={inputClasses}
                     />
                     <textarea
+                      required
                       rows={2}
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      placeholder="Branding, timeline, or other notes (optional)"
+                      placeholder="Specifications, branding, timeline, or other requirements"
                       className={`${inputClasses} resize-none`}
                     />
 
