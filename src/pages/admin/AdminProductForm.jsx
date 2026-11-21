@@ -18,7 +18,6 @@ export default function AdminProductForm() {
     tags: "",
     moq: "",
     stock: "",
-    isFeatured: false,
   });
   const [existingImages, setExistingImages] = useState([]);
   const [files, setFiles] = useState([]);
@@ -45,7 +44,6 @@ export default function AdminProductForm() {
           tags: (product.tags || []).join(", "),
           moq: product.moq ?? "",
           stock: product.stock ?? "",
-          isFeatured: product.isFeatured,
         });
         setExistingImages(product.images || []);
       })
@@ -217,11 +215,6 @@ export default function AdminProductForm() {
             </div>
           )}
         </div>
-
-        <label className="flex items-center gap-2.5 text-sm text-ink-900">
-          <input type="checkbox" name="isFeatured" checked={form.isFeatured} onChange={handleChange} className="w-4 h-4 accent-gold-600" />
-          Feature this product on the homepage
-        </label>
 
         <button
           type="submit"

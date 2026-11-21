@@ -1,12 +1,25 @@
 import { useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useCart } from "../context/CartContext";
-import { api } from "../lib/api";
+import { api, ApiError } from "../lib/api";
 import Icon from "../components/Icon";
 import Button from "../components/Button";
 import PhoneInput from "../components/PhoneInput";
 import PincodeInput from "../components/PincodeInput";
 import { inputClasses } from "../lib/formStyles";
+
+const RAZORPAY_SCRIPT_SRC = "https://checkout.razorpay.com/v1/checkout.js";
+
+function loadRazorpayScript() {
+  if (window.Razorpay) return Promise.resolve(true);
+  return new Promise((resolve) => {
+    const script = document.createElement("script");
+    script.src = RAZORPAY_SCRIPT_SRC;
+    script.onload = () => resolve(true);
+    script.onerror = () => resolve(false);
+    document.body.appendChild(script);
+  });
+}
 
 function CheckoutBanner({ eyebrow, title }) {
   return (
@@ -24,7 +37,6 @@ function CheckoutBanner({ eyebrow, title }) {
 
 export default function Checkout() {
   const { items, totalAmount, clearCart } = useCart();
-  const navigate = useNavigate();
   const [address, setAddress] = useState({
     line1: "",
     line2: "",
@@ -36,13 +48,67 @@ export default function Checkout() {
   const [notes, setNotes] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const [order, setOrder] = useState(null);
 
-  if (items.length === 0 && !order) {
+  // 'form' | 'awaiting-payment' | 'confirming' | 'confirmed' | 'payment-failed'
+  const [step, setStep] = useState("form");
+  const [order, setOrder] = useState(null);
+  const [razorpayConfig, setRazorpayConfig] = useState(null);
+  const [checking, setChecking] = useState(false);
+
+  if (items.length === 0 && step === "form") {
     return <Navigate to="/cart" replace />;
   }
 
   const handleChange = (e) => setAddress((a) => ({ ...a, [e.target.name]: e.target.value }));
+
+  const openRazorpay = async (createdOrder, config) => {
+    const loaded = await loadRazorpayScript();
+    if (!loaded || !window.Razorpay) {
+      setError("Couldn't load the payment gateway. Check your connection and try again.");
+      setStep("payment-failed");
+      return;
+    }
+
+    const rzp = new window.Razorpay({
+      key: config.razorpayKeyId,
+      order_id: config.razorpayOrderId,
+      amount: Math.round(config.amount * 100),
+      currency: config.currency,
+      name: "JE BAGS",
+      description: `Order #${createdOrder._id.slice(-8).toUpperCase()}`,
+      prefill: { contact: address.phone },
+      theme: { color: "#0a1526" },
+      handler: async (response) => {
+        setStep("confirming");
+        try {
+          const { order: verified, paid } = await api.post(`/orders/${createdOrder._id}/verify`, {
+            razorpay_order_id: response.razorpay_order_id,
+            razorpay_payment_id: response.razorpay_payment_id,
+            razorpay_signature: response.razorpay_signature,
+          });
+          setOrder(verified);
+          // Razorpay's own signature checked out; even if `paid` isn't true
+          // yet (payment still settling on their end), this was NOT a
+          // failure — the webhook will confirm it momentarily, so we show
+          // the reassuring "confirming" state rather than an error.
+          setStep(paid ? "confirmed" : "confirming");
+        } catch {
+          // The browser-side verify call failed (dropped connection, etc.)
+          // — Razorpay already has the money. Never show this as a failure;
+          // the webhook is independently confirming it right now regardless
+          // of whether this request succeeded.
+          setStep("confirming");
+        }
+      },
+    });
+
+    rzp.on("payment.failed", () => {
+      setStep("payment-failed");
+      setError("Your payment didn't go through. No amount has been charged for a failed attempt.");
+    });
+
+    rzp.open();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -59,40 +125,119 @@ export default function Checkout() {
 
     setLoading(true);
     try {
-      const { order } = await api.post("/orders", {
+      const data = await api.post("/orders", {
         items: items.map((i) => ({ productId: i.productId, quantity: i.quantity })),
         shippingAddress: address,
         notes: notes || undefined,
       });
       clearCart();
-      setOrder(order);
+      setOrder(data.order);
+      setRazorpayConfig({
+        razorpayOrderId: data.razorpayOrderId,
+        razorpayKeyId: data.razorpayKeyId,
+        amount: data.amount,
+        currency: data.currency,
+      });
+      setStep("awaiting-payment");
+      openRazorpay(data.order, {
+        razorpayOrderId: data.razorpayOrderId,
+        razorpayKeyId: data.razorpayKeyId,
+        amount: data.amount,
+        currency: data.currency,
+      });
     } catch (err) {
-      setError(err.message);
+      setError(err instanceof ApiError ? err.message : "Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
-  if (order) {
+  const handleCheckStatus = async () => {
+    setChecking(true);
+    setError("");
+    try {
+      const { order: checked } = await api.get(`/orders/${order._id}/reconcile`);
+      setOrder(checked);
+      if (checked.paymentStatus === "paid") setStep("confirmed");
+      else if (checked.paymentStatus === "failed") setStep("payment-failed");
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : "Couldn't check payment status, try again.");
+    } finally {
+      setChecking(false);
+    }
+  };
+
+  if (step === "confirmed" && order) {
     return (
       <>
-        <CheckoutBanner eyebrow="Order Confirmed" title="Order Placed" />
+        <CheckoutBanner eyebrow="Order Confirmed" title="Payment Received" />
         <section className="bg-cream-50 py-14 sm:py-16 px-5">
-        <div className="max-w-lg mx-auto text-center">
-          <div className="w-16 h-16 rounded-full bg-beige-200/70 flex items-center justify-center mx-auto mb-6">
-            <Icon name="check" size={28} className="text-gold-600" />
+          <div className="max-w-lg mx-auto text-center">
+            <div className="w-16 h-16 rounded-full bg-beige-200/70 flex items-center justify-center mx-auto mb-6">
+              <Icon name="check" size={28} className="text-gold-600" />
+            </div>
+            <p className="text-ink-700 mb-2">
+              Order <span className="font-mono text-ink-950">#{order._id.slice(-8).toUpperCase()}</span> for{" "}
+              <span className="font-semibold">₹{order.totalAmount.toLocaleString("en-IN")}</span> is confirmed.
+            </p>
+            <p className="text-sm text-ink-700/70 mb-8">
+              A confirmation email is on its way. We'll reach out with delivery updates.
+            </p>
+            <Button to="/products" variant="dark">
+              Continue Shopping
+            </Button>
           </div>
-          <p className="text-ink-700 mb-2">
-            Order <span className="font-mono text-ink-950">#{order._id.slice(-8).toUpperCase()}</span> for{" "}
-            <span className="font-semibold">₹{order.totalAmount.toLocaleString("en-IN")}</span> has been received.
-          </p>
-          <p className="text-sm text-ink-700/70 mb-8">
-            Payment is currently cash-on-delivery by default — online payment is coming soon. Our team will reach out to confirm.
-          </p>
-          <Button to="/products" variant="dark">
-            Continue Shopping
-          </Button>
-        </div>
+        </section>
+      </>
+    );
+  }
+
+  if ((step === "confirming" || step === "payment-failed") && order) {
+    return (
+      <>
+        <CheckoutBanner
+          eyebrow={step === "confirming" ? "Confirming Payment" : "Payment Issue"}
+          title={step === "confirming" ? "Almost there..." : "Payment Not Completed"}
+        />
+        <section className="bg-cream-50 py-14 sm:py-16 px-5">
+          <div className="max-w-lg mx-auto text-center">
+            <div
+              className={`w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 ${
+                step === "confirming" ? "bg-beige-200/70" : "bg-red-50"
+              }`}
+            >
+              {step === "confirming" ? (
+                <div className="w-7 h-7 rounded-full border-2 border-gold-500/30 border-t-gold-500 animate-spin" />
+              ) : (
+                <Icon name="x" size={28} className="text-red-500" />
+              )}
+            </div>
+
+            <p className="text-ink-700 mb-2">
+              Order <span className="font-mono text-ink-950">#{order._id.slice(-8).toUpperCase()}</span> for{" "}
+              <span className="font-semibold">₹{order.totalAmount.toLocaleString("en-IN")}</span>
+            </p>
+            <p className="text-sm text-ink-700/70 mb-8">
+              {step === "confirming"
+                ? "If you completed the payment, this confirms automatically within a few seconds — no need to pay again. If your bank shows a deduction but this doesn't update, use Check Payment Status below."
+                : error || "You can retry the payment, or check status if you're unsure whether it actually went through."}
+            </p>
+
+            {error && step === "confirming" && (
+              <p className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 mb-6">{error}</p>
+            )}
+
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+              {step === "payment-failed" && razorpayConfig && (
+                <Button type="button" onClick={() => openRazorpay(order, razorpayConfig)} variant="dark">
+                  Retry Payment
+                </Button>
+              )}
+              <Button type="button" onClick={handleCheckStatus} disabled={checking} variant="outline">
+                {checking ? "Checking..." : "Check Payment Status"}
+              </Button>
+            </div>
+          </div>
         </section>
       </>
     );
@@ -145,7 +290,7 @@ export default function Checkout() {
               icon={loading ? null : "arrow-right"}
               className="w-full"
             >
-              {loading ? "Placing Order..." : "Place Order"}
+              {loading ? "Preparing Payment..." : `Pay ₹${totalAmount.toLocaleString("en-IN")}`}
             </Button>
           </form>
         </div>

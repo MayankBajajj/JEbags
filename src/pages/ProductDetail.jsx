@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import { useCart } from "../context/CartContext";
-import { useQuote } from "../context/QuoteContext";
 import { api } from "../lib/api";
 import { company } from "../data/content";
 import Icon from "../components/Icon";
@@ -12,7 +11,6 @@ export default function ProductDetail() {
   const { slug } = useParams();
   const { user } = useAuth();
   const { addItem } = useCart();
-  const { addItem: addQuoteItem, openDrawer } = useQuote();
   const navigate = useNavigate();
   const [product, setProduct] = useState(null);
   const [error, setError] = useState("");
@@ -53,15 +51,6 @@ export default function ProductDetail() {
     addItem(product, quantity);
     setAdded(true);
     setTimeout(() => setAdded(false), 1800);
-  };
-
-  const handleRequestSample = () => {
-    if (!user) {
-      navigate("/login", { state: { from: { pathname: `/products/${slug}` } } });
-      return;
-    }
-    addQuoteItem(product);
-    openDrawer();
   };
 
   if (error) {
@@ -192,15 +181,6 @@ export default function ProductDetail() {
               >
                 {product.stock === 0 ? "Out of Stock" : added ? "Added to Cart" : "Add to Cart"}
               </Button>
-              <Button
-                type="button"
-                onClick={handleRequestSample}
-                variant="outline"
-                icon="clipboard-check"
-                className="w-full sm:w-auto"
-              >
-                Request Sample
-              </Button>
             </div>
           </div>
         </div>
@@ -224,8 +204,14 @@ export default function ProductDetail() {
             >
               <Icon name="phone" size={17} />
             </a>
-            <Button type="button" onClick={handleRequestSample} variant="primary" className="flex-1 sm:flex-none">
-              Order a Physical Sample
+            <Button
+              type="button"
+              onClick={handleAddToCart}
+              disabled={product.stock === 0}
+              variant="primary"
+              className="flex-1 sm:flex-none"
+            >
+              {product.stock === 0 ? "Out of Stock" : added ? "Added to Cart" : "Add to Cart"}
             </Button>
           </div>
         </div>

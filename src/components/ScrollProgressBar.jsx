@@ -62,37 +62,39 @@ export default function ScrollProgressBar() {
   }, []);
 
   return (
-    <div className="fixed top-[3px] left-0 right-0 z-[9999] h-2 bg-ink-950 overflow-hidden pointer-events-none transform-gpu">
-      {/* faint track */}
-      <svg
-        viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
-        preserveAspectRatio="none"
-        className="absolute inset-0 w-full h-full"
-      >
-        <path d={WAVE_PATH} fill="none" stroke="#faf5ec" strokeOpacity="0.18" strokeWidth="2.2" />
-      </svg>
-
-      {/* gold progress — revealed via clip-path, never width, so it's composite-only */}
-      <div
-        ref={fillRef}
-        className="absolute inset-0"
-        style={{ clipPath: "inset(0 100% 0 0)" }}
-      >
+    <div className="fixed top-0 left-0 right-0 z-[9999] h-[11px] bg-ink-950 overflow-hidden pointer-events-none transform-gpu">
+      <div className="absolute inset-x-0 bottom-0 h-2">
+        {/* faint track */}
         <svg
           viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
           preserveAspectRatio="none"
           className="absolute inset-0 w-full h-full"
         >
-          <path d={WAVE_PATH} fill="none" stroke="#d9af5c" strokeWidth="2.6" />
+          <path d={WAVE_PATH} fill="none" stroke="#faf5ec" strokeOpacity="0.18" strokeWidth="2.2" />
         </svg>
-      </div>
 
-      {/* glowing lead dot — positioned via transform, never left */}
-      <div
-        ref={dotRef}
-        className="absolute top-1/2 left-0 w-2 h-2 rounded-full bg-gold-400 shadow-[0_0_8px_3px_rgba(217,175,92,0.7)]"
-        style={{ transform: "translateY(-50%) translateX(-4px)" }}
-      />
+        {/* gold progress — revealed via clip-path, never width, so it's composite-only */}
+        <div
+          ref={fillRef}
+          className="absolute inset-0"
+          style={{ clipPath: "inset(0 100% 0 0)" }}
+        >
+          <svg
+            viewBox={`0 0 ${VIEW_WIDTH} ${VIEW_HEIGHT}`}
+            preserveAspectRatio="none"
+            className="absolute inset-0 w-full h-full"
+          >
+            <path d={WAVE_PATH} fill="none" stroke="#d9af5c" strokeWidth="2.6" />
+          </svg>
+        </div>
+
+        {/* glowing lead dot — positioned via transform, never left */}
+        <div
+          ref={dotRef}
+          className="absolute top-1/2 left-0 w-2 h-2 rounded-full bg-gold-400 shadow-[0_0_8px_3px_rgba(217,175,92,0.7)]"
+          style={{ transform: "translateY(-50%) translateX(-4px)" }}
+        />
+      </div>
     </div>
   );
 }

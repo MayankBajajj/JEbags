@@ -13,6 +13,7 @@ const QTY_PRESETS = [100, 500, 1000];
 
 function QuoteLineItem({ item }) {
   const { removeItem, updateQuantity } = useQuote();
+  const presets = QTY_PRESETS.filter((q) => q >= item.moq);
 
   return (
     <div className="flex gap-3 py-4 border-b border-cream-50/10">
@@ -36,7 +37,7 @@ function QuoteLineItem({ item }) {
         </div>
         <p className="text-xs text-cream-100/40 mt-0.5">MOQ: {item.moq} units</p>
         <div className="mt-2 flex items-center gap-1.5">
-          {QTY_PRESETS.map((q) => (
+          {presets.map((q) => (
             <button
               key={q}
               onClick={() => updateQuantity(item.productId, q)}

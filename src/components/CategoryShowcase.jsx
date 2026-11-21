@@ -1,7 +1,9 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import Reveal from "./Reveal";
 import Icon from "./Icon";
 import { categoryGroups } from "../data/content";
+import { api } from "../lib/api";
 
 import backpackPhoto from "../assets/photos/product-a-backpack.png";
 import trolleyPhoto from "../assets/photos/product-b-trolley.png";
@@ -10,7 +12,8 @@ import totePhoto from "../assets/photos/product-a-tote-bag.png";
 import giftPhoto from "../assets/photos/gifting-flatlay.png";
 import sleevePhoto from "../assets/photos/product-b-laptop-sleeve.png";
 
-const photoFor = {
+// placeholder mockups — used only until a real product exists in that category
+const fallbackPhotoFor = {
   "Backpacks & Business Bags": backpackPhoto,
   "Travel & Luggage": trolleyPhoto,
   "Delivery & Insulated Bags": coolerPhoto,
@@ -21,15 +24,35 @@ const photoFor = {
 
 export default function CategoryShowcase({ count = 6 }) {
   const groups = categoryGroups.slice(0, count);
+  const [productPhotos, setProductPhotos] = useState({});
+
+  useEffect(() => {
+    let cancelled = false;
+    Promise.all(
+      groups.map((g) =>
+        api
+          .get(`/products?category=${encodeURIComponent(g.title)}&limit=1`)
+          .then((d) => [g.title, d.items?.[0]?.images?.[0]?.url])
+          .catch(() => [g.title, undefined])
+      )
+    ).then((pairs) => {
+      if (cancelled) return;
+      setProductPhotos(Object.fromEntries(pairs.filter(([, url]) => url)));
+    });
+    return () => {
+      cancelled = true;
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [count]);
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
       {groups.map((group, i) => (
         <Reveal key={group.title} delay={i * 0.05}>
-          <Link to="/products" className="group block">
+          <Link to={`/products?category=${encodeURIComponent(group.title)}`} className="group block">
             <div className="relative aspect-square rounded-xl bg-beige-100 overflow-hidden">
               <img
-                src={photoFor[group.title]}
+                src={productPhotos[group.title] || fallbackPhotoFor[group.title]}
                 alt={group.title}
                 className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               />

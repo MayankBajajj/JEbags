@@ -6,6 +6,8 @@ const STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", 
 export default function AdminOrders() {
   const [orders, setOrders] = useState(null);
   const [error, setError] = useState("");
+  const [rechecking, setRechecking] = useState(null);
+  const [refunding, setRefunding] = useState(null);
 
   const load = () => {
     api
@@ -24,6 +26,33 @@ export default function AdminOrders() {
     } catch (err) {
       setOrders(prev);
       setError(err.message);
+    }
+  };
+
+  const handleRecheck = async (id) => {
+    setRechecking(id);
+    setError("");
+    try {
+      const { order } = await api.get(`/orders/${id}/reconcile`);
+      setOrders((os) => os.map((o) => (o._id === id ? order : o)));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRechecking(null);
+    }
+  };
+
+  const handleRefund = async (id) => {
+    if (!window.confirm("Refund this order's full payment? This cannot be undone.")) return;
+    setRefunding(id);
+    setError("");
+    try {
+      const { order } = await api.post(`/orders/admin/${id}/refund`, {});
+      setOrders((os) => os.map((o) => (o._id === id ? order : o)));
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setRefunding(null);
     }
   };
 
@@ -68,7 +97,45 @@ export default function AdminOrders() {
                     ))}
                   </td>
                   <td className="py-3 px-5 text-ink-900">₹{o.totalAmount.toLocaleString("en-IN")}</td>
-                  <td className="py-3 px-5 text-ink-700 capitalize">{o.paymentStatus}</td>
+                  <td className="py-3 px-5 text-ink-700">
+                    <span
+                      className={`capitalize ${
+                        o.paymentStatus === "paid"
+                          ? "text-green-700"
+                          : o.paymentStatus === "failed"
+                          ? "text-red-600"
+                          : o.paymentStatus === "refunded"
+                          ? "text-ink-700/70"
+                          : "text-ink-700"
+                      }`}
+                    >
+                      {o.paymentStatus}
+                    </span>
+                    {o.refund?.status && o.refund.status !== "none" && (
+                      <span className="block text-xs text-ink-700/60 capitalize">
+                        Refund: {o.refund.status}
+                        {o.refund.amount ? ` (₹${o.refund.amount.toLocaleString("en-IN")})` : ""}
+                      </span>
+                    )}
+                    {o.paymentStatus === "pending" && o.paymentMethod === "razorpay" && (
+                      <button
+                        onClick={() => handleRecheck(o._id)}
+                        disabled={rechecking === o._id}
+                        className="block mt-1 text-xs font-semibold text-gold-600 hover:text-gold-700 disabled:opacity-50"
+                      >
+                        {rechecking === o._id ? "Checking..." : "Recheck Payment"}
+                      </button>
+                    )}
+                    {o.paymentStatus === "paid" && (!o.refund || o.refund.status === "none" || o.refund.status === "failed") && (
+                      <button
+                        onClick={() => handleRefund(o._id)}
+                        disabled={refunding === o._id}
+                        className="block mt-1 text-xs font-semibold text-red-600 hover:text-red-700 disabled:opacity-50"
+                      >
+                        {refunding === o._id ? "Refunding..." : "Refund"}
+                      </button>
+                    )}
+                  </td>
                   <td className="py-3 px-5 text-ink-700">{new Date(o.createdAt).toLocaleDateString("en-IN")}</td>
                   <td className="py-3 px-5">
                     <select

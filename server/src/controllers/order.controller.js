@@ -3,6 +3,10 @@ import Order from "../models/Order.js";
 import Product from "../models/Product.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { phoneSchema, pincodeSchema } from "../utils/validators.js";
+import { createRazorpayOrder, fetchRazorpayPayment, verifyPaymentSignature } from "../config/razorpay.js";
+import { markOrderPaid, reconcileOrder, initiateRefund } from "../services/payment.service.js";
+
+const PAYMENT_EXPIRY_MINUTES = 20;
 
 const checkoutSchema = z.object({
   items: z
@@ -50,8 +54,9 @@ export const createOrder = asyncHandler(async (req, res) => {
     totalAmount += product.price * line.quantity;
   }
 
-  // Reserve stock. In a high-concurrency setting this should be a transaction;
-  // fine for current scale.
+  // Reserve stock up front so two checkouts can't both claim the last unit
+  // while payment is in flight. If payment ultimately fails or the order
+  // expires unpaid, payment.service.js puts this stock back.
   await Promise.all(
     items.map((item) => Product.updateOne({ _id: item.product }, { $inc: { stock: -item.quantity } }))
   );
@@ -61,10 +66,98 @@ export const createOrder = asyncHandler(async (req, res) => {
     items,
     shippingAddress: data.shippingAddress,
     totalAmount,
-    notes: data.notes,
+    paymentMethod: "razorpay",
+    paymentExpiresAt: new Date(Date.now() + PAYMENT_EXPIRY_MINUTES * 60 * 1000),
   });
 
-  res.status(201).json({ order });
+  let razorpayOrder;
+  try {
+    razorpayOrder = await createRazorpayOrder(totalAmount, order._id.toString());
+  } catch (err) {
+    // Payment gateway didn't accept the order — don't leave a dead order
+    // sitting on reserved stock the customer can never actually pay for.
+    await Promise.all(
+      items.map((item) => Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } }))
+    );
+    await Order.deleteOne({ _id: order._id });
+    console.error("Razorpay order creation failed:", err.message);
+    return res.status(502).json({ message: "Payment gateway is unavailable right now. Please try again shortly." });
+  }
+
+  order.razorpay.orderId = razorpayOrder.id;
+  await order.save();
+
+  res.status(201).json({
+    order,
+    razorpayOrderId: razorpayOrder.id,
+    razorpayKeyId: process.env.RAZORPAY_KEY_ID,
+    amount: totalAmount,
+    currency: "INR",
+  });
+});
+
+const verifySchema = z.object({
+  razorpay_order_id: z.string(),
+  razorpay_payment_id: z.string(),
+  razorpay_signature: z.string(),
+});
+
+// Fast path: called from the browser the instant Razorpay's checkout modal
+// reports success. Not trusted on its own for the amount — see
+// payment.service.js's markOrderPaid — but the signature proves this
+// order_id/payment_id pair genuinely came from Razorpay.
+export const verifyPayment = asyncHandler(async (req, res) => {
+  const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = verifySchema.parse(req.body);
+
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  if (order.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Not your order" });
+  }
+  if (order.razorpay?.orderId !== razorpay_order_id) {
+    return res.status(400).json({ message: "Order mismatch" });
+  }
+
+  const validSignature = verifyPaymentSignature({
+    orderId: razorpay_order_id,
+    paymentId: razorpay_payment_id,
+    signature: razorpay_signature,
+  });
+  if (!validSignature) {
+    return res.status(400).json({ message: "Payment verification failed" });
+  }
+
+  const payment = await fetchRazorpayPayment(razorpay_payment_id).catch(() => null);
+  if (!payment || payment.status !== "captured") {
+    // Signature was genuine but the payment itself isn't captured yet (rare
+    // timing edge case) — don't mark paid. The webhook will catch it the
+    // moment it is, and the customer can also hit "Check Payment Status".
+    return res.status(202).json({ message: "Payment is still processing", order });
+  }
+
+  const result = await markOrderPaid(order._id, {
+    paymentId: razorpay_payment_id,
+    signature: razorpay_signature,
+    amountPaise: payment.amount,
+    source: "verify",
+    event: "payment.captured",
+  });
+
+  res.json({ order: result.order || order, paid: Boolean(result.order) });
+});
+
+// Manual "Check Payment Status" — and also what the expiry sweep calls
+// before giving up on a stuck order. Asks Razorpay directly rather than
+// trusting anything the client says.
+export const reconcilePayment = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+  if (order.user.toString() !== req.user.id && req.user.role !== "admin") {
+    return res.status(403).json({ message: "Not your order" });
+  }
+
+  const result = await reconcileOrder(order._id);
+  res.json({ order: result.order || order, updated: result.updated });
 });
 
 export const myOrders = asyncHandler(async (req, res) => {
@@ -106,6 +199,24 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
   if (!order) return res.status(404).json({ message: "Order not found" });
   res.json({ order });
+});
+
+// POST /api/orders/admin/:id/refund — a deliberate, separate admin action.
+// Never triggered automatically by cancelling an order, since that would
+// move real money without an explicit decision each time.
+export const refundOrder = asyncHandler(async (req, res) => {
+  const result = await initiateRefund(req.params.id, { source: "admin" });
+
+  if (!result.updated) {
+    const messages = {
+      not_found: "Order not found",
+      not_paid: "Only paid orders can be refunded",
+      no_payment: "No payment record found for this order",
+    };
+    return res.status(400).json({ message: messages[result.reason] || "Refund could not be started" });
+  }
+
+  res.json({ order: result.order, refund: result.refund });
 });
 
 // GET /api/orders/admin/analytics
