@@ -7,6 +7,7 @@ import { phoneSchema, pincodeSchema } from "../utils/validators.js";
 import { createRazorpayOrder, fetchRazorpayPayment, verifyPaymentSignature } from "../config/razorpay.js";
 import { markOrderPaid, reconcileOrder, initiateRefund } from "../services/payment.service.js";
 import { syncOrderToShiprocket, refreshShipmentStatus } from "../services/shiprocket.service.js";
+import { cancelShiprocketOrder } from "../config/shiprocket.js";
 
 const PAYMENT_EXPIRY_MINUTES = 20;
 
@@ -240,6 +241,30 @@ export const updateOrderStatus = asyncHandler(async (req, res) => {
   const order = await Order.findByIdAndUpdate(req.params.id, { status }, { new: true });
   if (!order) return res.status(404).json({ message: "Order not found" });
   res.json({ order });
+});
+
+// DELETE /api/orders/admin/:id — for removing test/mistaken orders (e.g. a
+// self-test order placed during setup/verification), not a customer-facing
+// cancellation. Releases any stock still reserved, cancels the Shiprocket
+// shipment if one was created, then removes the order entirely.
+export const deleteOrder = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) return res.status(404).json({ message: "Order not found" });
+
+  if (order.paymentStatus === "pending") {
+    await Promise.all(
+      order.items.map((item) => Product.updateOne({ _id: item.product }, { $inc: { stock: item.quantity } }))
+    );
+  }
+
+  if (order.shiprocket?.orderId) {
+    await cancelShiprocketOrder(order.shiprocket.orderId).catch((err) =>
+      console.error(`Shiprocket cancel failed while deleting order ${order._id}:`, err.message)
+    );
+  }
+
+  await Order.deleteOne({ _id: order._id });
+  res.json({ ok: true });
 });
 
 // POST /api/orders/admin/:id/refund — a deliberate, separate admin action.

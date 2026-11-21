@@ -8,6 +8,7 @@ import {
   getOrder,
   adminListOrders,
   updateOrderStatus,
+  deleteOrder,
   refundOrder,
   salesAnalytics,
 } from "../controllers/order.controller.js";
@@ -22,6 +23,7 @@ router.get("/admin/all", authenticate, requireAdmin, adminListOrders);
 router.get("/admin/analytics", authenticate, requireAdmin, salesAnalytics);
 router.patch("/admin/:id/status", authenticate, requireAdmin, updateOrderStatus);
 router.post("/admin/:id/refund", authenticate, requireAdmin, refundOrder);
+router.delete("/admin/:id", authenticate, requireAdmin, deleteOrder);
 
 router.post("/:id/verify", authenticate, verifyPayment);
 router.get("/:id/reconcile", authenticate, reconcilePayment);

@@ -9,6 +9,7 @@ export default function AdminOrders() {
   const [rechecking, setRechecking] = useState(null);
   const [refunding, setRefunding] = useState(null);
   const [refreshingShipping, setRefreshingShipping] = useState(null);
+  const [deleting, setDeleting] = useState(null);
 
   const load = () => {
     api
@@ -70,6 +71,19 @@ export default function AdminOrders() {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (!window.confirm("Permanently delete this order? This is meant for test/mistaken orders, not real customer cancellations — it cannot be undone.")) return;
+    setDeleting(id);
+    setError("");
+    try {
+      await api.delete(`/orders/admin/${id}`);
+      setOrders((os) => os.filter((o) => o._id !== id));
+    } catch (err) {
+      setError(err.message);
+      setDeleting(null);
+    }
+  };
+
   return (
     <div className="p-8 sm:p-10">
       <h1 className="font-display font-semibold text-2xl text-ink-950 mb-1">Orders</h1>
@@ -95,6 +109,7 @@ export default function AdminOrders() {
                 <th className="py-3 px-5">Shipping</th>
                 <th className="py-3 px-5">Placed</th>
                 <th className="py-3 px-5">Status</th>
+                <th className="py-3 px-5"></th>
               </tr>
             </thead>
             <tbody>
@@ -189,6 +204,15 @@ export default function AdminOrders() {
                         </option>
                       ))}
                     </select>
+                  </td>
+                  <td className="py-3 px-5">
+                    <button
+                      onClick={() => handleDelete(o._id)}
+                      disabled={deleting === o._id}
+                      className="text-xs font-semibold text-ink-700/50 hover:text-red-600 disabled:opacity-50"
+                    >
+                      {deleting === o._id ? "Deleting..." : "Delete"}
+                    </button>
                   </td>
                 </tr>
               ))}
