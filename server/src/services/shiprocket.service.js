@@ -65,3 +65,41 @@ export async function refreshShipmentStatus(orderId) {
   const updated = await Order.findOneAndUpdate({ _id: orderId }, { $set: update }, { new: true });
   return { updated: true, order: updated };
 }
+
+// Shiprocket's field names for its webhook payload aren't 100% confirmed
+// without having seen a real call yet — this reads several plausible
+// spellings for each value so it degrades gracefully if the exact shape
+// differs from what's assumed here. `channel_order_id` is the order_id WE
+// sent when creating the order (our own Order._id), so that's the most
+// reliable way to find the right doc; Shiprocket's own order/shipment id
+// are the fallbacks.
+export async function applyShiprocketWebhook(payload) {
+  const channelOrderId = payload.channel_order_id || payload.order_id_channel;
+  const shiprocketOrderId = payload.order_id ? String(payload.order_id) : undefined;
+  const shipmentId = payload.shipment_id ? String(payload.shipment_id) : undefined;
+
+  let order = null;
+  if (channelOrderId) order = await Order.findById(channelOrderId).catch(() => null);
+  if (!order && shiprocketOrderId) order = await Order.findOne({ "shiprocket.orderId": shiprocketOrderId });
+  if (!order && shipmentId) order = await Order.findOne({ "shiprocket.shipmentId": shipmentId });
+
+  if (!order) return { updated: false, reason: "no_matching_order" };
+
+  const awbCode = payload.awb || payload.awb_code || order.shiprocket.awbCode || "";
+  const status = payload.current_status || payload.status || payload.shipment_status || order.shiprocket.status;
+
+  await Order.updateOne(
+    { _id: order._id },
+    {
+      $set: {
+        "shiprocket.status": status,
+        "shiprocket.awbCode": awbCode,
+        "shiprocket.courierName": payload.courier_name || payload.courier || order.shiprocket.courierName || "",
+        "shiprocket.trackingUrl": awbCode ? `https://shiprocket.co/tracking/${awbCode}` : order.shiprocket.trackingUrl || "",
+        "shiprocket.lastSyncedAt": new Date(),
+      },
+    }
+  );
+
+  return { updated: true, orderId: order._id };
+}

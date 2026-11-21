@@ -122,3 +122,10 @@ export async function createShiprocketOrder(order, user) {
 export async function trackShipmentById(shipmentId) {
   return request(`/courier/track/shipment/${shipmentId}`);
 }
+
+// Shiprocket's webhook config lets you set a static "Secret Key" that it
+// echoes back on every call (sent as the x-api-key header) — simple shared-
+// secret check, not an HMAC signature like Razorpay's webhook.
+export function verifyWebhookToken(token) {
+  return Boolean(process.env.SHIPROCKET_WEBHOOK_SECRET) && token === process.env.SHIPROCKET_WEBHOOK_SECRET;
+}

@@ -19,6 +19,7 @@ import orderRoutes from "./routes/order.routes.js";
 import enquiryRoutes from "./routes/enquiry.routes.js";
 import customBuildRoutes from "./routes/customBuild.routes.js";
 import paymentRoutes from "./routes/payment.routes.js";
+import shippingRoutes from "./routes/shipping.routes.js";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 // server/src -> server/public (built frontend lives inside server/ so it
@@ -50,6 +51,7 @@ app.use("/api/orders", orderRoutes);
 app.use("/api/enquiries", enquiryRoutes);
 app.use("/api/custom-build", customBuildRoutes);
 app.use("/api/payments", paymentRoutes);
+app.use("/api/shipping", shippingRoutes);
 
 app.use("/api", notFound);
 
