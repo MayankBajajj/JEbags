@@ -18,6 +18,7 @@ export default function AdminProductForm() {
     tags: "",
     moq: "",
     stock: "",
+    isFeatured: false,
   });
   const [existingImages, setExistingImages] = useState([]);
   const [files, setFiles] = useState([]);
@@ -44,6 +45,7 @@ export default function AdminProductForm() {
           tags: (product.tags || []).join(", "),
           moq: product.moq ?? "",
           stock: product.stock ?? "",
+          isFeatured: Boolean(product.isFeatured),
         });
         setExistingImages(product.images || []);
       })
@@ -177,6 +179,11 @@ export default function AdminProductForm() {
           <label className="block text-xs font-semibold text-ink-900 mb-2">Tags (comma-separated)</label>
           <input name="tags" value={form.tags} onChange={handleChange} className={inputClasses} placeholder="OEM Ready, Custom Branding" />
         </div>
+
+        <label className="flex items-center gap-2.5 cursor-pointer">
+          <input type="checkbox" name="isFeatured" checked={form.isFeatured} onChange={handleChange} className="w-4 h-4 rounded border-ink-900/25" />
+          <span className="text-sm text-ink-900">Feature this product (shows in homepage banners)</span>
+        </label>
 
         {isEdit && existingImages.length > 0 && (
           <div>

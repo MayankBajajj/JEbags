@@ -1,4 +1,6 @@
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { api } from "../lib/api";
 import Hero from "../components/Hero";
 import TrustStrip from "../components/TrustStrip";
 import CategoryShowcase from "../components/CategoryShowcase";
@@ -17,6 +19,65 @@ import zipperPhoto from "../assets/photos/zipper-texture.png";
 import giftingPhoto from "../assets/photos/gifting-flatlay.png";
 
 export default function Home() {
+  // Banner photos default to the static marketing shots above, but swap in
+  // a real uploaded product photo per slot as soon as one's available —
+  // these banners shouldn't be the only place on the site still showing
+  // stock imagery once the catalog has products in it.
+  const [bannerPhotos, setBannerPhotos] = useState({
+    oem: oemPhoto,
+    retail: retailPhoto,
+    whyUs: zipperPhoto,
+    gifting: giftingPhoto,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    const giftingCategory = encodeURIComponent("Corporate Gifting & Events");
+
+    async function load() {
+      // Featured products (admin-curated, via the "Feature this product"
+      // checkbox) take priority over just "newest" so a stray test entry
+      // in the catalog can never end up on the homepage unintended.
+      const [featuredRes, generalRes, giftingFeaturedRes] = await Promise.all([
+        api.get("/products?featured=true&limit=3").catch(() => null),
+        api.get("/products?limit=3").catch(() => null),
+        api.get(`/products?featured=true&category=${giftingCategory}&limit=1`).catch(() => null),
+      ]);
+      if (cancelled) return;
+
+      const featured = featuredRes?.items || [];
+      const general = generalRes?.items || [];
+      const usedIds = new Set();
+      const pick = () => {
+        const chosen = featured.find((p) => !usedIds.has(p._id)) || general.find((p) => !usedIds.has(p._id));
+        if (chosen) usedIds.add(chosen._id);
+        return chosen;
+      };
+      const slot1 = pick();
+      const slot2 = pick();
+      const slot3 = pick();
+
+      let giftingItem = giftingFeaturedRes?.items?.[0];
+      if (!giftingItem) {
+        const giftingRes = await api.get(`/products?category=${giftingCategory}&limit=1`).catch(() => null);
+        if (cancelled) return;
+        giftingItem = giftingRes?.items?.[0];
+      }
+
+      setBannerPhotos((prev) => ({
+        oem: slot1?.images?.[0]?.url || prev.oem,
+        retail: slot2?.images?.[0]?.url || prev.retail,
+        whyUs: slot3?.images?.[0]?.url || prev.whyUs,
+        gifting: giftingItem?.images?.[0]?.url || prev.gifting,
+      }));
+    }
+
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
   return (
     <>
       <div className="flex flex-col min-h-dvh sm:min-h-0 sm:block">
@@ -52,7 +113,7 @@ export default function Home() {
             title="Your Design. Our Manufacturing."
             description="We bring your ideas to life with custom designs, material selection, branding, and bulk production."
             ctaLabel="Start Your OEM Project"
-            photo={oemPhoto}
+            photo={bannerPhotos.oem}
           />
           <SplitBanner
             tone="light"
@@ -62,7 +123,7 @@ export default function Home() {
             description="Durable, functional bags for individuals and retail customers — ready to brand as your own."
             ctaLabel="Shop Our Range"
             ctaTo="/products"
-            photo={retailPhoto}
+            photo={bannerPhotos.retail}
           />
         </div>
       </section>
@@ -145,7 +206,7 @@ export default function Home() {
             tone="dark"
             eyebrow="Why Choose JE Bags"
             title="Your Reliable Manufacturing Partner."
-            photo={zipperPhoto}
+            photo={bannerPhotos.whyUs}
             icons={whyUs.slice(0, 4).map((w) => ({ icon: w.icon, label: w.title }))}
           />
           <SplitBanner
@@ -156,7 +217,7 @@ export default function Home() {
             description="Unique, customised gifting solutions for employees, events, and brand promotions."
             ctaLabel="Explore Corporate Gifting"
             ctaTo="/products"
-            photo={giftingPhoto}
+            photo={bannerPhotos.gifting}
           />
         </div>
       </section>
