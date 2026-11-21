@@ -125,7 +125,7 @@ export default function BagGridReveal() {
     <div
       key={replayKey}
       ref={containerRef}
-      className="relative group/bag max-w-[min(520px,48vh)] mx-auto aspect-square"
+      className="relative group/bag max-w-[min(280px,30vh)] sm:max-w-[min(520px,48vh)] mx-auto aspect-square"
       style={{ perspective: 1000 }}
     >
       <Link
