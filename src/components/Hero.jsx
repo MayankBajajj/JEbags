@@ -5,7 +5,7 @@ import heroVideo from "../assets/videos/hero-video.mp4";
 
 export default function Hero() {
   return (
-    <section className="relative bg-cream-50 pt-20 pb-6 sm:pt-44 sm:pb-16 lg:pt-32 lg:pb-10 flex-1 sm:flex-none sm:min-h-[max(560px,78vh)] lg:min-h-[max(620px,82vh)] flex flex-col justify-center overflow-hidden">
+    <section className="relative bg-cream-50 pt-24 pb-6 sm:pt-44 sm:pb-16 lg:pt-32 lg:pb-10 flex-1 sm:flex-none sm:min-h-[max(560px,78vh)] lg:min-h-[max(620px,82vh)] flex flex-col justify-center overflow-hidden">
       <video
         className="absolute inset-0 w-full h-full object-cover scale-110 sm:scale-100 opacity-[0.45] will-change-transform"
         src={heroVideo}
