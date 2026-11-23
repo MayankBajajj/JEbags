@@ -148,6 +148,14 @@ export const categoryGroups = [
 
 export const howWeWorkSteps = [
   {
+    id: "design-sampling",
+    icon: "pen-tool",
+    title: "Designing & Sampling",
+    description: "Concepts developed into physical prototypes for approval before bulk production.",
+    detail:
+      "A physical sample is approved before a single unit goes into bulk production. This is where a sketch or reference photo becomes a real, holdable bag — compartment sizes, strap placement, zipper pull quality, and stitching detail are all finalised here. You get to handle the actual sample, request changes, and sign off before we commit any material or labour to a full run.",
+  },
+  {
     id: "material-sourcing",
     icon: "warehouse",
     title: "Material Sourcing",
@@ -157,28 +165,20 @@ export const howWeWorkSteps = [
       "Every fabric, lining, and hardware component is inspected on arrival, before it's cleared for cutting. We check for colour consistency across the batch, fabric weight and weave, and that zippers, buckles, and rivets match the approved sample — not just a general spec sheet. Anything that doesn't meet the grade gets sent back before it ever touches the cutting table, so problems are caught at the cheapest possible point to fix them.",
   },
   {
-    id: "pattern-making",
+    id: "pattern-cutting",
     icon: "ruler",
-    title: "Pattern Making",
-    description: "Technical patterns drafted and graded to your exact specifications and sizing.",
+    title: "Pattern Cutting",
+    description: "Technical patterns drafted, graded, and cut to your exact specifications and sizing.",
     detail:
       "Patterns are graded across sizes so fit and proportions stay consistent across an entire order. Our pattern team works directly from your reference design or sketch, translating it into technical panels, seam allowances, and hardware placement points. Each pattern is test-cut once before it's approved for bulk cutting, so sizing issues get caught on paper and fabric, not after a thousand units are already cut.",
-  },
-  {
-    id: "design-sampling",
-    icon: "pen-tool",
-    title: "Bag Designing & Sampling",
-    description: "Concepts developed into physical prototypes for approval before bulk production.",
-    detail:
-      "A physical sample is approved before a single unit goes into bulk production. This is where a sketch or reference photo becomes a real, holdable bag — compartment sizes, strap placement, zipper pull quality, and stitching detail are all finalised here. You get to handle the actual sample, request changes, and sign off before we commit any material or labour to a full run.",
   },
   {
     id: "fabric-cutting",
     icon: "scissors",
     title: "Fabric Cutting",
-    description: "Precision cutting to minimise wastage and ensure consistency across every panel.",
+    description: "Precision cutting across stacked fabric layers to minimise wastage and ensure uniform panels.",
     detail:
-      "Panels are cut in bulk using approved patterns, keeping wastage and sizing variance to a minimum. Fabric is layered and cut in stacks, so every panel in the order — whether it's 50 units or 5,000 — comes from the same precise template. This is also where fabric grain direction and pattern alignment (for printed or textured materials) get checked, so panels match correctly once assembled.",
+      "Panels are cut in bulk using approved patterns, keeping wastage and sizing variance to a minimum. Fabric is layered and cut in stacks with industrial vertical knife cutters, so every panel in the order — whether it's 50 units or 5,000 — comes from the same precise template. This is also where fabric grain direction and pattern alignment (for printed or textured materials) get checked, so panels match correctly once assembled.",
   },
   {
     id: "printing-embroidery",
@@ -197,20 +197,12 @@ export const howWeWorkSteps = [
       "Reinforced stitching is used at stress points — handles, zippers, and seams — for everyday durability. Panels, linings, pockets, and hardware are assembled in sequence by operators trained on that specific bag style, not a generalist line. Stitch density and thread tension are checked periodically through the run, since a bag that looks fine on day one needs to hold up after months of actual use.",
   },
   {
-    id: "quality-control",
+    id: "quality-control-finishing",
     icon: "shield-check",
-    title: "Quality Control",
-    description: "In-line checks at every stage catch defects before they reach the next process.",
+    title: "Quality Control & Finishing",
+    description: "In-line checks, thread trimming, and detailing for a clean, retail-ready appearance.",
     detail:
-      "Checks happen between stages, not just at the end, so defects are caught before more work is added on top. A stitching flaw is far cheaper to fix right after assembly than after the bag has already been through finishing, branding, and packaging. In-line checks mean fewer units get rejected at the final stage, which keeps both quality and delivery timelines predictable.",
-  },
-  {
-    id: "finishing",
-    icon: "sparkles",
-    title: "Finishing",
-    description: "Thread trimming, pressing, and detailing for a clean, retail-ready appearance.",
-    detail:
-      "Loose threads are trimmed, surfaces cleaned, and every unit aligned to the approved sample. This stage also covers shaping bags on presses so panels sit flat and corners hold their form, plus a final check that every zipper pull, buckle, and label is seated correctly. It's the difference between a bag that's technically finished and one that actually looks retail-ready out of the bag.",
+      "Checks happen between stages and loose threads are trimmed with specialized suction trimmers before packaging. Surfaces are cleaned, and every unit is aligned to the approved sample. This stage also covers shaping bags on presses so panels sit flat and corners hold their form, plus a check that every zipper pull, buckle, and label is seated correctly.",
   },
   {
     id: "final-inspection",
@@ -221,12 +213,12 @@ export const howWeWorkSteps = [
       "A complete unit-by-unit audit against your approved sample before anything is packed. This covers stitching integrity, hardware function (every zipper gets pulled, every buckle gets clipped), colour consistency across the batch, and a side-by-side comparison with the signed-off sample. Anything that doesn't match gets pulled from the batch rather than shipped and discovered by your customer.",
   },
   {
-    id: "packaging-dispatch",
+    id: "packing-dispatch",
     icon: "package",
-    title: "Packaging & Dispatch",
+    title: "Packing & Dispatch",
     description: "Secure packaging and dispatch coordination for on-time delivery, anywhere.",
     detail:
-      "Bags are packed to prevent transit damage, with dispatch coordinated to your delivery timeline. Each unit is bagged or boxed individually where needed, then cartoned for bulk shipment with void-fill to stop movement in transit. For export orders, we coordinate documentation and carrier scheduling alongside packing, so the physical and paperwork sides of dispatch move together instead of one holding up the other.",
+      "Bags are packed to prevent transit damage, with dispatch coordinated to your delivery timeline. Each unit is bagged or boxed individually where needed, then cartoned or packed into heavy-duty dispatch sacks with machine stitching for bulk transit. For export orders, we coordinate documentation and carrier scheduling alongside packing, so the physical and paperwork sides of dispatch move together instead of one holding up the other.",
   },
 ];
 

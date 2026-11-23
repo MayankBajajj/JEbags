@@ -6,32 +6,30 @@ import Icon from "../components/Icon";
 import Button from "../components/Button";
 import { howWeWorkSteps } from "../data/content";
 
-import materialSourcingVideo from "../assets/videos/process/material-sourcing.mp4";
-import patternMakingVideo from "../assets/videos/process/pattern-making.mp4";
 import designSamplingVideo from "../assets/videos/process/design-sampling.mp4";
+import materialSourcingVideo from "../assets/videos/process/material-sourcing.mp4";
+import patternCuttingVideo from "../assets/videos/process/pattern-cutting.mp4";
 import fabricCuttingVideo from "../assets/videos/process/fabric-cutting.mp4";
 import printingEmbroideryVideo from "../assets/videos/process/printing-embroidery.mp4";
 import stitchingAssemblyVideo from "../assets/videos/process/stitching-assembly.mp4";
-import qualityControlVideo from "../assets/videos/process/quality-control.mp4";
-import finishingVideo from "../assets/videos/process/finishing.mp4";
+import qualityControlFinishingVideo from "../assets/videos/process/quality-control-finishing.mp4";
 import finalInspectionVideo from "../assets/videos/process/final-inspection.mp4";
-import packagingDispatchVideo from "../assets/videos/process/packaging-dispatch.mp4";
+import packingDispatchVideo from "../assets/videos/process/packing-dispatch.mp4";
 
 const ribbonClip = "polygon(22% 0%, 100% 0%, 78% 100%, 0% 100%)";
 const EASE = [0.22, 1, 0.36, 1];
 
 // Short muted clips cut straight from our own factory floor video — one per stage.
 const videoMap = {
-  "material-sourcing": materialSourcingVideo,
-  "pattern-making": patternMakingVideo,
   "design-sampling": designSamplingVideo,
+  "material-sourcing": materialSourcingVideo,
+  "pattern-cutting": patternCuttingVideo,
   "fabric-cutting": fabricCuttingVideo,
   "printing-embroidery": printingEmbroideryVideo,
   "stitching-assembly": stitchingAssemblyVideo,
-  "quality-control": qualityControlVideo,
-  finishing: finishingVideo,
+  "quality-control-finishing": qualityControlFinishingVideo,
   "final-inspection": finalInspectionVideo,
-  "packaging-dispatch": packagingDispatchVideo,
+  "packing-dispatch": packingDispatchVideo,
 };
 
 function StepCard({ step, index, active }) {
@@ -39,7 +37,7 @@ function StepCard({ step, index, active }) {
   const videoRef = useRef(null);
   const cardRef = useRef(null);
 
-  // Only decode/play the clips actually near the viewport — with 10 looping
+  // Only decode/play the clips actually near the viewport — with 9 looping
   // videos on this page, letting all of them decode at once is what was
   // causing browsers to occasionally bleed a frame from one clip into
   // another (a real decoder-contention issue, not a content bug).
@@ -157,7 +155,7 @@ export default function HowWeWork() {
         eyebrow="Our Process"
         title="From Concept"
         highlight="to Delivery"
-        description="Every order moves through the same disciplined, ten-stage process — so quality stays consistent whether you're ordering 50 units or 50,000."
+        description="Every order moves through the same disciplined, nine-stage process — so quality stays consistent whether you're ordering 50 units or 50,000."
       />
 
       <section className="bg-beige-100 py-20 sm:py-28 relative overflow-hidden">
@@ -177,7 +175,7 @@ export default function HowWeWork() {
                 Straight From Our Floor
               </span>
               <h2 className="font-display font-semibold text-3xl sm:text-4xl text-ink-950 leading-tight">
-                A Ten-Stage Quality Process
+                A Nine-Stage Quality Process
               </h2>
             </div>
             <div className="hidden sm:flex w-20 h-20 rounded-full bg-gold-500 flex-col items-center justify-center text-center shadow-lg shadow-ink-900/20 rotate-3 shrink-0">
