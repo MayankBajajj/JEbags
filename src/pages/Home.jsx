@@ -181,7 +181,7 @@ export default function Home() {
               We supply custom bags to international brands, importers, distributors, and
               retailers — with consistent quality, competitive pricing, and reliable delivery.
             </p>
-            <div className="grid grid-cols-2 gap-x-6 gap-y-4 mb-9 max-w-md">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 sm:gap-y-4 mb-9 max-w-md">
               {exportCapabilities.map((item) => (
                 <div key={item.label} className="flex items-center gap-2.5">
                   <Icon name={item.icon} size={17} className="text-gold-400 shrink-0" />

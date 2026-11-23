@@ -3,7 +3,7 @@ import heroVideo from "../assets/videos/hero-video.mp4";
 
 export default function PageHero({ eyebrow, title, highlight, description, children }) {
   return (
-    <section className="relative overflow-hidden bg-cream-50 pt-28 pb-14 sm:pt-48 sm:pb-20">
+    <section className="relative overflow-hidden bg-cream-50 pt-24 pb-10 sm:pt-48 sm:pb-20">
       <video
         className="absolute inset-0 w-full h-full object-cover scale-110 sm:scale-100 opacity-[0.45]"
         src={heroVideo}
@@ -28,7 +28,7 @@ export default function PageHero({ eyebrow, title, highlight, description, child
             </span>
           )}
 
-          <h1 className="mt-5 font-display font-black uppercase text-[9vw] sm:text-5xl md:text-6xl leading-[1.02] tracking-tight text-ink-950">
+          <h1 className="mt-4 sm:mt-5 font-display font-black uppercase text-4xl sm:text-5xl md:text-6xl leading-[1.08] sm:leading-[1.02] tracking-tight text-ink-950">
             {title}
             {highlight && (
               <>

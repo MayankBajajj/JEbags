@@ -237,7 +237,7 @@ export default function About() {
                 quality, branding, and business objectives.
               </p>
             </div>
-            <div className="mt-8 grid grid-cols-2 gap-x-6 gap-y-4 max-w-md">
+            <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 sm:gap-y-4 max-w-md">
               {[
                 { icon: "globe", label: "Domestic & International Reach" },
                 { icon: "handshake", label: "Long-Term Partnerships" },

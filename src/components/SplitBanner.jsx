@@ -72,7 +72,7 @@ export default function SplitBanner({
           )}
 
           {icons && (
-            <div className="grid grid-cols-2 gap-x-5 gap-y-2.5 sm:gap-y-3 mb-5 sm:mb-7">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-5 gap-y-2 sm:gap-y-3 mb-5 sm:mb-7">
               {icons.map((item) => (
                 <div key={item.label} className="flex items-center gap-2">
                   <Icon
